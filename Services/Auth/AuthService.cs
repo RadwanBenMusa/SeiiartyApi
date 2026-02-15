@@ -14,61 +14,39 @@ using System;
 
 namespace TamaApi.Services.Auth
 {
-    public class AuthService : IAuthService
+    public class AuthService(IConfiguration config) : IAuthService
     {
-        public IConfiguration _Configuration { get; }
-
-        public AuthService(IConfiguration config)
-        {
-            _Configuration = config;
-            //_logger = logger;
-            //_authService = authService;
-        }
-
+        public IConfiguration Configuration { get; } = config;
 
         public const string key = "HiSaiidMusa195$$";
 
         public static string Encrypt(string password)
         {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(key);
-                aesAlg.IV = new byte[16];
-                ICryptoTransform cryptoTransform = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+            using Aes aesAlg = Aes.Create();
+            aesAlg.Key = Encoding.UTF8.GetBytes(key);
+            aesAlg.IV = new byte[16];
+            ICryptoTransform cryptoTransform = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
-                        {
-                            streamWriter.Write(password);
-                        }
-                    }
-                    return Convert.ToBase64String(memoryStream.ToArray());
-                }
+            using MemoryStream memoryStream = new();
+            using (CryptoStream cryptoStream = new(memoryStream, cryptoTransform, CryptoStreamMode.Write))
+            {
+                using StreamWriter streamWriter = new(cryptoStream);
+                streamWriter.Write(password);
             }
+            return Convert.ToBase64String(memoryStream.ToArray());
         }
 
         public static string Decrypt(string encryptedTxt)
         {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(key);
-                aesAlg.IV = new byte[16];
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+            using Aes aesAlg = Aes.Create();
+            aesAlg.Key = Encoding.UTF8.GetBytes(key);
+            aesAlg.IV = new byte[16];
+            ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(encryptedTxt)))
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-                            return srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
-            }
+            using MemoryStream msDecrypt = new(Convert.FromBase64String(encryptedTxt));
+            using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
+            using StreamReader srDecrypt = new(csDecrypt);
+            return srDecrypt.ReadToEnd();
         }
 
         [Obsolete]
@@ -77,15 +55,15 @@ namespace TamaApi.Services.Auth
             if (PhoneToken == null) return true;
 
             _logger.LogInformation("XXX_CheckPhoneToken");
-            DataTable dtUser = GetTable("[User]", StrFN: "ID", StrFV: userId.ToString(), DeletionDateIsNull: true);
+            DataTable dtUser = ExecCommand(new RequestCmd() { Cmd = $"Select * from [User] where ID = {userId} And DeletionDate = null" }); 
 
             if (dtUser.Rows.Count > 0)
             {
-                string dbPhoneToken = General.getValueString(dtUser.Rows[0], "phoneToken");
+                string dbPhoneToken = General.GetValueString(dtUser.Rows[0], "phoneToken");
                 if (string.IsNullOrEmpty(dbPhoneToken))
                 {
                     string cmd = $"Update [User] Set phoneToken='{PhoneToken}' Where ID={userId}";
-                    ExecCommand(new TamaRequestCmd() { Cmd = cmd });
+                    ExecCommand(new RequestCmd() { Cmd = cmd });
                     return true;
                 }
                 else
@@ -102,7 +80,7 @@ namespace TamaApi.Services.Auth
         public int Login(UserData user, ILogger<AuthController> _logger)
         {
             _logger.LogInformation("XXX_AuthService_Login");
-            DataTable dtUser = GetTable("[User]", StrFN: "PhoneNumber", StrFV: user.PhoneNumber, DeletionDateIsNull: true);
+            DataTable dtUser = ExecCommand(new RequestCmd() { Cmd = $"Select * from [User] where PhoneNumber = {user.PhoneNumber} And DeletionDate = null" });
             //DataTable dtUser = JsonConvert.DeserializeObject<DataTable>(msgRes.Data!)!;
             if (dtUser.Rows.Count > 0)
             {
@@ -113,7 +91,7 @@ namespace TamaApi.Services.Auth
                     int userId = (int)dtUser.Rows[0]["Id"];
                     string lastLogin= $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day} {DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}";
                     string cmd = $"Update [User] Set lastLogin='{lastLogin}' Where ID={userId}";
-                    ExecCommand(new TamaRequestCmd() { Cmd = cmd });
+                    ExecCommand(new RequestCmd() { Cmd = cmd });
                     return userId;
                 }
             }
@@ -143,26 +121,24 @@ namespace TamaApi.Services.Auth
         {
             if (string.IsNullOrEmpty(PhoneNo)) return false;
             if (PhoneNo.Length != 12) return false;
-
-            long number1 = 0;
-            bool canConvert = long.TryParse(PhoneNo, out number1);
+            bool canConvert = long.TryParse(PhoneNo, out _);
             if (canConvert != true) return false;
 
             return true;
         }
 
-        static string ApiKey = "78512214deafed6a";
-        static string SecretKet = "bce5825b";
-        static string callerID = "Tamam";
-        static string length = "4";
-        static string BaseUrl = "https://otp.libyasms.com/";
+        static readonly string ApiKey = "78512214deafed6a";
+        static readonly string SecretKet = "bce5825b";
+        static readonly string callerID = "Tamam";
+        static readonly string length = "4";
+        static readonly string BaseUrl = "https://otp.libyasms.com/";
 
         [Obsolete]
         private dynamic CheckOtpForWhat(UserToSendOTP userToSendOTP)
         {
             if (userToSendOTP.OtpForWhat == null) return new { MsgId = 1 };
 
-            DataTable dtUser = GetTable("[User]", StrFN: "PhoneNumber", StrFV: userToSendOTP.PhoneNumber, DeletionDateIsNull: true);
+            DataTable dtUser = ExecCommand(new RequestCmd() { Cmd = $"Select * from [User] where PhoneNumber = {userToSendOTP.PhoneNumber} And DeletionDate = null" });
 
             switch (userToSendOTP.OtpForWhat)
             {
@@ -193,7 +169,7 @@ namespace TamaApi.Services.Auth
         [Obsolete]
         public dynamic SendOTP(UserToSendOTP userToSendOTP)
         {
-            string PhoneNumber = checkPhoneNumberOk(userToSendOTP.PhoneNumber);
+            string PhoneNumber = CheckPhoneNumberOk(userToSendOTP.PhoneNumber);
             if (PhoneNumber == "")
             {
                 return new
@@ -208,10 +184,10 @@ namespace TamaApi.Services.Auth
             if (msgRes.MsgId != 1)
                 return msgRes;
 
-            DataTable tdSetupTable =  GetTable("SetupTable");
+            DataTable tdSetupTable = DbService.GetSetupTable();
             if ((bool)tdSetupTable.DefaultView[0]["OtpDebugMode"] == true)
             {
-                DataRes xxx = new DataRes()
+                DataRes xxx = new()
                 {
                     Status = "0",
                     Text = "ACCEPTD",
@@ -264,13 +240,13 @@ namespace TamaApi.Services.Auth
         {
             var authClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, "+218910001122"),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role,"+218910001122"),
+                new(ClaimTypes.Name, "+218910001122"),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(ClaimTypes.Role,"+218910001122"),
             };
             var token = GetToken(authClaims, forResetOrRegister:true);
 
-            DataTable tdSetupTable = GetTable("SetupTable");
+            DataTable tdSetupTable = DbService.GetSetupTable();
             if ((bool)tdSetupTable.DefaultView[0]["OtpDebugMode"] == true)
             {
                 return new
@@ -322,7 +298,7 @@ namespace TamaApi.Services.Auth
         [Obsolete]
         public dynamic GetSetupTable() 
         {
-            return GetTable("SetupTable");
+            return DbService.GetSetupTable();
         }
 
         [Obsolete]
@@ -336,24 +312,24 @@ namespace TamaApi.Services.Auth
             bool forResetOrRegister1;
             forResetOrRegister1 = forResetOrRegister ?? false;
 
-            double expirCount = 0;
+            double expirCount;
             if (forResetOrRegister1)
                 expirCount = 2;
             else
             {
-                DataTable dtSetuTable = GetSetupTable();
+                DataTable dtSetuTable = DbService.GetSetupTable();
                 expirCount = double.Parse(dtSetuTable.DefaultView[0]["TokenExpiredHours"].ToString()!);
             }
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_Configuration["JWT:Secret"]!));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]!));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
             DateTime xxx = (expiredTokenMinutes != 0) ? DateTime.Now.AddMinutes(expiredTokenMinutes) : forResetOrRegister1 ? DateTime.Now.AddMinutes(expirCount) : DateTime.Now.AddHours(expirCount);
             xxx.ToLocalTime();
 
             var token = new JwtSecurityToken(
-                issuer: _Configuration["JWT:ValidIssuer"],
-                audience: _Configuration["JWT:ValidAudience"],
+                issuer: Configuration["JWT:ValidIssuer"],
+                audience: Configuration["JWT:ValidAudience"],
                 claims: authClaims,
                 expires: (expiredTokenMinutes != 0) ? DateTime.Now.AddMinutes(expiredTokenMinutes) : forResetOrRegister1 ? DateTime.Now.AddMinutes(expirCount) : DateTime.Now.AddHours(expirCount),
                 signingCredentials: signinCredentials

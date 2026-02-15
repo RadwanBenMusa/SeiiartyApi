@@ -6,7 +6,7 @@ namespace TamaApi
 {
     public class General
     {
-        public static string checkPhoneNumberOk(string phoneNo)
+        public static string CheckPhoneNumberOk(string phoneNo)
         {
             if (string.IsNullOrEmpty(phoneNo)) return "";
             phoneNo = phoneNo.Replace("-", "");
@@ -21,43 +21,43 @@ namespace TamaApi
             phoneNo = phoneNo.Replace("(", "");
             phoneNo = phoneNo.Replace(")", "");
 
-            foreach (char s in phoneNo.Substring(1))
+            foreach (char s in phoneNo[1..])
                 if (!char.IsDigit(s)) return "";
 
             if (!phoneNo.StartsWith("+2189")) return "";
             if (phoneNo.Length != 13) return "";
             return phoneNo;
         }
-        public static string getDateTimeFromat(DateTime dateTime)
+        public static string GetDateTimeFromat(DateTime dateTime)
         {
             return $"{dateTime.Year}-{dateTime.Month}-{dateTime.Day} {dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}";
         }
-        public static bool getValueBool(DataRow dr, string fieldName, bool? defaultValue=false) {
+        public static bool GetValueBool(DataRow dr, string fieldName, bool? defaultValue=false) {
             if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return (bool)defaultValue!;
 
             bool res = (bool)dr[fieldName];
             return res;
         }
-        public static int getValueBoolZeroOne(DataRow dr, string fieldName, bool? defaultValue = false)
+        public static int GetValueBoolZeroOne(DataRow dr, string fieldName, bool? defaultValue = false)
         {
             if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return ((bool)defaultValue!)?1:0;
             return ((bool)dr[fieldName]) ? 1 : 0; ;
         }
-        public static decimal getValueDecimal(DataRow dr, string fieldName, decimal? defaultValue = 0)
+        public static decimal GetValueDecimal(DataRow dr, string fieldName, decimal? defaultValue = 0)
         {
             if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return (decimal)defaultValue!;
 
             decimal res = (decimal)dr[fieldName];
             return res;
         }
-        public static string getValueString(DataRow dr, string fieldName, string? defaultValue = "")
+        public static string GetValueString(DataRow dr, string fieldName, string? defaultValue = "")
         {
             if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue!;
 
             string res =(string)dr[fieldName];
             return res;
         }
-        public static int getValueInt(DataRow dr, string fieldName, int? defaultValue = 0)
+        public static int GetValueInt(DataRow dr, string fieldName, int? defaultValue = 0)
         {
             if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return (int)defaultValue!;
 

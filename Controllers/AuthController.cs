@@ -41,18 +41,11 @@ namespace TamaApi.Controllers
     [Route("[controller]")]
     [ApiController]
 
-    public class AuthController : ControllerBase
+    public class AuthController(IConfiguration config, ILogger<AuthController> logger, IAuthService authService) : ControllerBase
     {
-        public IConfiguration _Configuration { get; }
-        private readonly IAuthService _authService;
-        private readonly ILogger<AuthController> _logger;
-
-        public AuthController(IConfiguration config, ILogger<AuthController> logger, IAuthService authService)
-        {
-            _Configuration = config;
-            _logger = logger;
-            _authService = authService;
-        }
+        public IConfiguration Configuration { get; } = config;
+        private readonly IAuthService _authService = authService;
+        private readonly ILogger<AuthController> _logger = logger;
 
         [HttpPost("Login")]
         public IActionResult Login(UserData user)
@@ -118,45 +111,8 @@ namespace TamaApi.Controllers
             }
         }
 
-        [HttpPost("VerifyOTP")]
-        public IActionResult VerifyOTP(UserToVerifyOTP userToVerifyOTP)
-        {
-            try
-            {
-                _logger.LogInformation($"XXX_AuthController_VerifyOTP ===> userToVerifyOTP = {JsonConvert.SerializeObject(userToVerifyOTP)}");
-                dynamic msgRes = _authService.VerifyOTP(userToVerifyOTP);
-                _logger.LogInformation($"XXX_AuthController_VerifyOTP ===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
-                return StatusCode(StatusCodes.Status200OK, msgRes);
-            }
-            catch (Exception Ex)
-            {
-                _logger.LogError($"XXX_AuthController_VerifyOTP ===> Error = {Ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, Ex.Message);
-            }
-        }
-
-        [HttpPost("SendOTP")]
-        public IActionResult SendOTP(UserToSendOTP userToSendOTP)
-        {
-            try
-            {
-                _logger.LogInformation($"XXX_AuthController_SendOTP ===> userToSendOTP = {JsonConvert.SerializeObject(userToSendOTP)}");
-                dynamic msgRes = _authService.SendOTP(userToSendOTP);
-                _logger.LogInformation($"XXX_AuthController_SendOTP ===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
-                return StatusCode(StatusCodes.Status200OK, msgRes);
-            }
-            catch (Exception Ex)
-            {
-                _logger.LogError($"XXX_AuthController_SendOTP ===> Error = {Ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, Ex.Message);
-            }
-        }
-
-#if DEBUG
         [HttpPost("Register")]
-#else
-        [HttpPost("Register"), Authorize]
-#endif
+
         public IActionResult Register(UserData user)
         {
             try { 
@@ -171,7 +127,7 @@ namespace TamaApi.Controllers
             }
         }
 
-        [HttpPost("ResetPassword"), Authorize]
+        [HttpPost("ResetPassword")]
         public IActionResult ResetPassword(UserData user)
         {
             try
@@ -189,7 +145,7 @@ namespace TamaApi.Controllers
         }
 
 
-        [HttpPost("Delete"), Authorize]
+        [HttpPost("Delete")]
         public IActionResult Delete(UserData user)
         {
             try

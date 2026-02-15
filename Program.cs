@@ -5,7 +5,6 @@ using Serilog;
 using System.Text;
 using TamaApi.Services.Auth;
 using TamaApi.Services.Main;
-using TamaApi.Services.PaymentCallBack;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -102,7 +101,6 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IMainService, MainService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IPaymentCallBackService, PaymentCallBackService>();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
