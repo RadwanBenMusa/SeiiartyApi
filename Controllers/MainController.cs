@@ -23,7 +23,7 @@ namespace TamaApi.Controllers
         }
 
 
-        [HttpPost("ExecStoredProcedure"), Authorize]
+        [HttpPost("ExecStoredProcedure")]
 
         public IActionResult ExecStoredProcedure(Request request)
         {

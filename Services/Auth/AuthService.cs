@@ -77,7 +77,7 @@ namespace TamaApi.Services.Auth
         }
 
         [Obsolete]
-        public int Login(UserData user, ILogger<AuthController> _logger)
+        public int User(UserData user, ILogger<AuthController> _logger)
         {
             _logger.LogInformation("XXX_AuthService_Login");
             DataTable dtUser = ExecCommand(new RequestCmd() { Cmd = $"Select * from [User] where PhoneNumber = {user.PhoneNumber} And DeletionDate = null" });
@@ -98,33 +98,6 @@ namespace TamaApi.Services.Auth
 
             return 0;
             //throw new NotImplementedException();
-        }
-
-        [Obsolete]
-        public dynamic Register(UserData user)
-        {
-            return RegisterUser(user.PhoneNumber, Encrypt(user.Password!)).ToDynamic();
-        }
-
-        [Obsolete]
-        public dynamic Delete(UserData user)
-        {
-            return DeleteUser(user.PhoneNumber).ToDynamic();
-        }
-
-        [Obsolete]
-        public dynamic ResetPassword(UserData user)
-        {
-            return ResetPasswordUser(user.PhoneNumber, Encrypt(user.Password!)).ToDynamic();
-        }
-        private static bool PhoneFormatOk(string PhoneNo)
-        {
-            if (string.IsNullOrEmpty(PhoneNo)) return false;
-            if (PhoneNo.Length != 12) return false;
-            bool canConvert = long.TryParse(PhoneNo, out _);
-            if (canConvert != true) return false;
-
-            return true;
         }
 
         static readonly string ApiKey = "78512214deafed6a";

@@ -20,13 +20,5 @@ namespace TamaApi.Services.db
         {
             return $"{dateTime.Year}-{dateTime.Month}-{dateTime.Day} 00:00:00";
         }
-
-        [Obsolete]
-
-        public static int GetUserIdByPhone(string PhoneNo)
-        {
-            return 1;
-        }
-       
     }
 }

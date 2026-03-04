@@ -17,41 +17,14 @@ namespace TamaApi.Services.db
 #endif
         const string connStr = "user id=sa;password=195205085;Max Pool Size=20000;Pooling=true";
 
-
-     
-        public class ClsWhatsAppMsgAnalysisRes
-        {
-            public required int ClinicNo { get; set; }
-            public required string FileName { get; set; }
-            public string? OtherInfo { get; set; }
-            public required string CustomerPhoneNo { get; set; }
-        }
-
-        public class ClsSmsLinkAnalysisRes
-        {
-            public required int ClinicNo { get; set; }
-            public required string FileName { get; set; }
-            public string? OtherInfo { get; set; }
-            public required string CustomerPhoneNo { get; set; }
-        }
-
-        public class ClsWhatsAppMsg
-        {
-            public required int ClinicNo { get; set; }
-            public required string Budy { get; set; }
-            public string? OtherInfo { get; set; }
-            public required string CustomerPhoneNo { get; set; }
-        }
         public class Request
         {
             public required string SpName { get; set; }
-            public int? ClinicId {  set; get; }
             public List<Para>? Paras { get; set; }
         }
         public class RequestCmd
         {
             public required string Cmd { get; set; }
-            public int? ClinicId { get; set; }
         }
         public class Para
         {
@@ -174,87 +147,6 @@ namespace TamaApi.Services.db
             return dt;
         }
 
-        [Obsolete]
-        public static int ExecCommandIns(RequestCmd requestCmd, SqlConnection? sqlConn=null, SqlTransaction? transaction=null)
-        {
-            SqlCommand command;
-            bool sqlConnClose=true;
-            if (sqlConn == null) { 
-                sqlConnClose = false;
-                sqlConn = GetSqlConnection()!;
-                sqlConn.Open();
-                command = new SqlCommand(requestCmd.Cmd + " SELECT SCOPE_IDENTITY();", sqlConn) { CommandType = CommandType.Text };
-            }else
-                command = new SqlCommand(requestCmd.Cmd + " SELECT SCOPE_IDENTITY();", sqlConn) { CommandType = CommandType.Text };
-
-
-            int newId;
-
-            object result;
-            result = command.ExecuteScalar();
-
-            newId = Convert.ToInt32(result);
-
-            if(sqlConnClose) sqlConn.Close();
-
-            return newId; 
-        }
-
-        [Obsolete]
-        public static int ExecCommandFunction(Request request)
-        {
-            SqlConnection sqlConn = GetSqlConnection()!;
-
-            sqlConn.Open();
-
-            using SqlCommand command = new(request.SpName, sqlConn);
-            command.CommandType = CommandType.Text;
-            // إضافة المعاملات للدالة
-            if (request.Paras != null)
-                foreach (Para para in request.Paras)
-                    command.Parameters.AddWithValue($"@{para.Name}", para.Value);
-            object scalarResult = command.ExecuteScalar();
-            if (scalarResult != null && scalarResult != DBNull.Value)
-            {
-                return Convert.ToInt32(scalarResult);
-            }
-            return 0;
-        }
-    
-        [Obsolete]
-        public static DataTable RegisterUser(string PhoneNumber, string Password )
-        {
-            Request request = new() { SpName = "sp_Ins_User", Paras = [] };
-
-            request.Paras!.Add(new Para() { Name = "PhoneNumber", DataType = SqlDbType.NVarChar, Value = PhoneNumber });
-            request.Paras.Add(new Para() { Name = "Password", DataType = SqlDbType.NVarChar, Value = Password });
-
-            return ExecSp(request);
-        }
-
-        [Obsolete]
-        public static DataTable DeleteUser(string PhoneNumber)
-        {
-            Request request = new() { SpName = "sp_Ins_User", Paras = [] };
-
-            request.Paras!.Add(new Para() { Name = "PhoneNumber", DataType = SqlDbType.NVarChar, Value = PhoneNumber });
-            request.Paras.Add(new Para() { Name = "Delete", DataType = SqlDbType.Bit, Value = "1" });
-
-            return ExecSp(request);
-        }
-        
-        [Obsolete]
-        public static DataTable ResetPasswordUser(string PhoneNumber, string Password)
-        {
-            Request request = new() { SpName = "sp_Ins_User", Paras = [] };
-
-            request.Paras!.Add(new Para() { Name = "PhoneNumber", DataType = SqlDbType.NVarChar, Value = PhoneNumber });
-            request.Paras.Add(new Para() { Name = "Password", DataType = SqlDbType.NVarChar, Value = Password });
-            request.Paras.Add(new Para() { Name = "ResetPassword", DataType = SqlDbType.Bit, Value = "1" });
-
-            return ExecSp(request);
-        }
-        
         private static string CleanDate(string ExDate)
         {
             DateTime parsedDate = DateTime.Parse(ExDate);

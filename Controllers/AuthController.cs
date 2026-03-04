@@ -14,7 +14,6 @@ namespace TamaApi.Controllers
     {
         public required string PhoneNumber { get; set; }
         public string? Password { get; set; } = "";
-        public int? ExpiredTokenMinutes { get; set; }
         public string? PhoneToken { get; set; }
     }
 
@@ -47,13 +46,13 @@ namespace TamaApi.Controllers
         private readonly IAuthService _authService = authService;
         private readonly ILogger<AuthController> _logger = logger;
 
-        [HttpPost("Login")]
-        public IActionResult Login(UserData user)
+        [HttpPost("User")]
+        public IActionResult User(UserData user)
         {
             try
             {
                 _logger.LogInformation($"XXX_AuthController_Login ===> user = {JsonConvert.SerializeObject(user)}");
-                int userId = _authService.Login(user, _logger);
+                int userId = _authService.User(user, _logger);
                 if (userId == 0)
                 {
                     return StatusCode(StatusCodes.Status200OK,
@@ -73,7 +72,7 @@ namespace TamaApi.Controllers
                         new(ClaimTypes.Role,user.PhoneNumber),
                     };
 
-                var token = _authService.GetToken(authClaims, ExpiredTokenMinutes: user.ExpiredTokenMinutes);
+                var token = _authService.GetToken(authClaims);
 
                 var resData = new{
                     userId,
@@ -110,57 +109,5 @@ namespace TamaApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, Ex.Message);
             }
         }
-
-        [HttpPost("Register")]
-
-        public IActionResult Register(UserData user)
-        {
-            try { 
-            _logger.LogInformation($"XXX_AuthController_Register ===> user = {JsonConvert.SerializeObject(user)}");
-            dynamic msgRes = _authService.Register(user);
-            _logger.LogInformation($"XXX_AuthController_Register ===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
-            return StatusCode(StatusCodes.Status200OK, msgRes);
-            }
-            catch (Exception Ex) {
-                _logger.LogError($"XXX_AuthController_Register ===> Error = {Ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, Ex.Message);
-            }
-        }
-
-        [HttpPost("ResetPassword")]
-        public IActionResult ResetPassword(UserData user)
-        {
-            try
-            {
-                _logger.LogInformation($"XXX_AuthController_Register ===> user = {JsonConvert.SerializeObject(user)}");
-                dynamic msgRes = _authService.ResetPassword(user);
-                _logger.LogInformation($"XXX_AuthController_Register ===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
-                return StatusCode(StatusCodes.Status200OK, msgRes);
-            }
-            catch (Exception Ex)
-            {
-                _logger.LogError($"XXX_AuthController_Register ===> Error = {Ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, Ex.Message);
-            }
-        }
-
-
-        [HttpPost("Delete")]
-        public IActionResult Delete(UserData user)
-        {
-            try
-            {
-                _logger.LogInformation($"XXX_AuthController_DetletUser ===> user = {JsonConvert.SerializeObject(user)}");
-                dynamic msgRes = _authService.Delete(user);
-                _logger.LogInformation($"XXX_AuthController_DetletUser ===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
-                return StatusCode(StatusCodes.Status200OK, msgRes);
-            }
-            catch (Exception Ex)
-            {
-                _logger.LogError($"XXX_AuthController_Register ===> Error = {Ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, Ex.Message);
-            }
-        }
-
     }
 }
