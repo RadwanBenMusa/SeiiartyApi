@@ -9,12 +9,12 @@
   <ItemGroup>
     <Content Include="bin\Debug\net8.0\appsettings.Development.json" />
     <Content Include="bin\Debug\net8.0\appsettings.json" />
-    <Content Include="bin\Debug\net8.0\TamaApi.deps.json" />
-    <Content Include="bin\Debug\net8.0\TamaApi.runtimeconfig.json" />
+    <Content Include="bin\Debug\net8.0\Seiiarty.deps.json" />
+    <Content Include="bin\Debug\net8.0\Seiiarty.runtimeconfig.json" />
     <Content Include="bin\Release\net8.0\appsettings.Development.json" />
     <Content Include="bin\Release\net8.0\appsettings.json" />
-    <Content Include="bin\Release\net8.0\TamaApi.deps.json" />
-    <Content Include="bin\Release\net8.0\TamaApi.runtimeconfig.json" />
+    <Content Include="bin\Release\net8.0\Seiiarty.deps.json" />
+    <Content Include="bin\Release\net8.0\Seiiarty.runtimeconfig.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,9 +48,9 @@
     <None Include="bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll" />
     <None Include="bin\Debug\net8.0\System.Data.SqlClient.dll" />
     <None Include="bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll" />
-    <None Include="bin\Debug\net8.0\TamaApi.dll" />
-    <None Include="bin\Debug\net8.0\TamaApi.exe" />
-    <None Include="bin\Debug\net8.0\TamaApi.pdb" />
+    <None Include="bin\Debug\net8.0\Seiiarty.dll" />
+    <None Include="bin\Debug\net8.0\Seiiarty.exe" />
+    <None Include="bin\Debug\net8.0\Seiiarty.pdb" />
     <None Include="bin\Release\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll" />
     <None Include="bin\Release\net8.0\Microsoft.Extensions.DependencyModel.dll" />
     <None Include="bin\Release\net8.0\Microsoft.IdentityModel.Abstractions.dll" />
@@ -81,14 +81,15 @@
     <None Include="bin\Release\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll" />
     <None Include="bin\Release\net8.0\System.Data.SqlClient.dll" />
     <None Include="bin\Release\net8.0\System.IdentityModel.Tokens.Jwt.dll" />
-    <None Include="bin\Release\net8.0\TamaApi.dll" />
-    <None Include="bin\Release\net8.0\TamaApi.exe" />
-    <None Include="bin\Release\net8.0\TamaApi.pdb" />
+    <None Include="bin\Release\net8.0\Seiiarty.dll" />
+    <None Include="bin\Release\net8.0\Seiiarty.exe" />
+    <None Include="bin\Release\net8.0\Seiiarty.pdb" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="Serilog" Version="4.1.0" />
@@ -102,6 +103,16 @@
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="General\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="seiiarty-54af7-firebase-adminsdk.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

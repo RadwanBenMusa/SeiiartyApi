@@ -1,18 +1,17 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json;
 using System.Data;
-using TamaApi.Controllers;
-using static TamaApi.Services.db.DbService;
+using Seiiarty.Controllers;
+using static Seiiarty.Services.db.DbService;
 using System.Text;
 using System.Security.Cryptography;
-using static TamaApi.General;
+using static Seiiarty.General;
 using RestSharp;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using TamaApi.Services.db;
-using System;
+using Seiiarty.Services.db;
 
-namespace TamaApi.Services.Auth
+namespace Seiiarty.Services.Auth
 {
     public class AuthService(IConfiguration config) : IAuthService
     {
@@ -50,11 +49,11 @@ namespace TamaApi.Services.Auth
         }
 
         [Obsolete]
-        public bool CheckPhoneToken(int userId,string? PhoneToken, ILogger<AuthController> _logger)
+        public bool CheckPhoneToken(int userId,string? PhoneToken)
         {
             if (PhoneToken == null) return true;
 
-            _logger.LogInformation("XXX_CheckPhoneToken");
+            
             DataTable dtUser = ExecCommand(new RequestCmd() { Cmd = $"Select * from [User] where ID = {userId} And DeletionDate = null" }); 
 
             if (dtUser.Rows.Count > 0)
@@ -77,9 +76,9 @@ namespace TamaApi.Services.Auth
         }
 
         [Obsolete]
-        public int User(UserData user, ILogger<AuthController> _logger)
+        public int User(UserData user)
         {
-            _logger.LogInformation("XXX_AuthService_Login");
+            
             DataTable dtUser = ExecCommand(new RequestCmd() { Cmd = $"Select * from [User] where PhoneNumber = {user.PhoneNumber} And DeletionDate = null" });
             //DataTable dtUser = JsonConvert.DeserializeObject<DataTable>(msgRes.Data!)!;
             if (dtUser.Rows.Count > 0)

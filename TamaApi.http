@@ -1,6 +1,0 @@
-@TamaApi_HostAddress = http://localhost:5213
-
-GET {{TamaApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -8,3 +8,12 @@ dotnet_analyzer_diagnostic.category-Performance.severity = silent
 
 # CS0108: Member hides inherited member; missing new keyword
 dotnet_diagnostic.CS0108.severity = silent
+
+# CS8604: Possible null reference argument.
+dotnet_diagnostic.CS8604.severity = silent
+
+# CS8600: Converting null literal or possible null value to non-nullable type.
+dotnet_diagnostic.CS8600.severity = silent
+
+# CS8603: Possible null reference return.
+dotnet_diagnostic.CS8603.severity = silent

@@ -1,14 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using TamaApi.Controllers;
-using static TamaApi.General;
+using Seiiarty.Controllers;
 
-namespace TamaApi.Services.Auth
+namespace Seiiarty.Services.Auth
 {
     public interface IAuthService
     {
-        public int User(UserData user, ILogger<AuthController> _logger);
-        public bool CheckPhoneToken(int userId,string? PhoneToken, ILogger<AuthController> _logger); 
+        public int User(UserData user);
+        public bool CheckPhoneToken(int userId,string? PhoneToken); 
         public dynamic SendOTP(UserToSendOTP userToSendOTP);
         public dynamic VerifyOTP(UserToVerifyOTP userToVerifyOTP);
         public dynamic GetSetupTable();

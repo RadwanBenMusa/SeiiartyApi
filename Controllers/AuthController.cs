@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using TamaApi.Services.Auth;
+using Seiiarty.Services.Auth;
 
-namespace TamaApi.Controllers
+namespace Seiiarty.Controllers
 {
     public class UserData
     {
@@ -39,20 +37,19 @@ namespace TamaApi.Controllers
 
     [Route("[controller]")]
     [ApiController]
-
-    public class AuthController(IConfiguration config, ILogger<AuthController> logger, IAuthService authService) : ControllerBase
+    [AllowAnonymous]
+    public class AuthController(IConfiguration config, IAuthService authService) : ControllerBase
     {
         public IConfiguration Configuration { get; } = config;
         private readonly IAuthService _authService = authService;
-        private readonly ILogger<AuthController> _logger = logger;
 
         [HttpPost("User")]
+        
         public IActionResult User(UserData user)
         {
             try
             {
-                _logger.LogInformation($"XXX_AuthController_Login ===> user = {JsonConvert.SerializeObject(user)}");
-                int userId = _authService.User(user, _logger);
+                int userId = _authService.User(user);
                 if (userId == 0)
                 {
                     return StatusCode(StatusCodes.Status200OK,
@@ -81,7 +78,7 @@ namespace TamaApi.Controllers
                     expiration = token.ValidTo.ToLocalTime()
                 };
 
-                if (!_authService.CheckPhoneToken(userId, user.PhoneToken, _logger)){
+                if (!_authService.CheckPhoneToken(userId, user.PhoneToken)){
                     return StatusCode(StatusCodes.Status200OK,
                         new
                         {
@@ -105,9 +102,16 @@ namespace TamaApi.Controllers
             }
             catch (Exception Ex)
             {
-                _logger.LogError($"XXX_AuthController_Login ===> Error = {Ex.Message}");
+                
                 return StatusCode(StatusCodes.Status500InternalServerError, Ex.Message);
             }
+        }
+
+        [HttpGet("Ping")]
+        public IActionResult Ping(string? test = "")
+        {
+            //_logger.LogInformation($"XXX_MainController (Ping)");
+            return Ok($"Pinging == Ok\n{test}");
         }
     }
 }

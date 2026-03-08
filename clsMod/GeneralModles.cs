@@ -1,17 +1,12 @@
 ﻿using FirebaseAdmin.Messaging;
-using Serilog.Parsing;
 
-namespace TamaApi.clsMod
+namespace Seiiarty.clsMod
 {
     
     public enum EnumNotificationType
     {
-        contactUs,
-        searchMedecine,
-        clinicAdmins,
-        examWaitinglist,
-        analysisResPatient,
-        analysisResDoc
+        request,
+        contactUs
     }
     public class ApiNotification
     {

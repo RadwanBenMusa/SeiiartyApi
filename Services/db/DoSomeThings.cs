@@ -1,18 +1,6 @@
-﻿ using static TamaApi.Services.db.DbService;
-using System.Data.SqlClient;
-using System.Data;
-using System.Text.RegularExpressions;
-using System;
-using TamaApi.clsMod;
-using System.CodeDom.Compiler;
-using System.IO;
-using System.Linq;
-using Newtonsoft.Json;
-using TamaApi.Controllers;
-using System.ServiceProcess;
-using System.Threading.Tasks;
+﻿
 
-namespace TamaApi.Services.db
+namespace Seiiarty.Services.db
 {
     public static class DoSomeThings
     {

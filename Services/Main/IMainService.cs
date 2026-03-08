@@ -1,17 +1,15 @@
 ﻿using FirebaseAdmin.Messaging;
-using TamaApi.clsMod;
-using TamaApi.Controllers;
-using static TamaApi.Controllers.MainController;
-using static TamaApi.Services.db.DbService;
+using Seiiarty.clsMod;
+using Seiiarty.Controllers;
+using static Seiiarty.Services.db.DbService;
 
-namespace TamaApi.Services.Main
+namespace Seiiarty.Services.Main
 {
     public interface IMainService
     {
-        public dynamic ExecStoredProcedure(Request request);
         public dynamic ExecCmd(RequestCmd requestCmd);
         public dynamic DoSomeThings(Request request);
-        public Task<dynamic> Notification(ApiNotification apiNotification, ILogger<MainController> _logger);
+        public Task<dynamic> Notification(ApiNotification apiNotification);
 
     }
 }

@@ -1,21 +1,28 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Seiiarty.Services.Auth;
+using Seiiarty.Services.Main;
+using Seiiarty.Services.Sp;
 using Serilog;
 using System.Text;
-using TamaApi.Services.Auth;
-using TamaApi.Services.Main;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("seiiarty-54af7-firebase-adminsdk.json")
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddRazorPages();
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
@@ -73,7 +80,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TamamApi", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Seiiarty", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -101,6 +108,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IMainService, MainService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISpService, SpService>();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -125,4 +133,5 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapRazorPages();
 app.UseCors();
+app.UseAuthentication();
 app.Run();

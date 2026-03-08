@@ -3,13 +3,13 @@ using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using Newtonsoft.Json;
 using System.Data;
-using System.Text.Json;
-using TamaApi.clsMod;
-using TamaApi.Controllers;
-using static TamaApi.General;
-using static TamaApi.Services.db.DbService;
+using Seiiarty.clsMod;
+using Seiiarty.Controllers;
+using static Seiiarty.General;
+using static Seiiarty.Services.db.DbService;
+using Seiiarty.StoredProcedures;
 
-namespace TamaApi.Services.Main
+namespace Seiiarty.Services.Main
 {
     public class ApiResponse
     {
@@ -18,46 +18,41 @@ namespace TamaApi.Services.Main
         public required string Text { get; set; }
         public required string Message_ID { get; set; }
     }
-    public class MainService(ILogger<MainController> _logger) : IMainService
+    public class MainService() : IMainService
     {
-        readonly ILogger<MainController> logger = _logger;
+        
+
+  
 
         [Obsolete]
-        public dynamic ExecStoredProcedure(Request tamaRequest)
+        public dynamic DoSomeThings(Request request)
         {
-            return ExecSp(tamaRequest).ToDynamic();
-        }
-
-        [Obsolete]
-        public dynamic DoSomeThings(Request tamaRequest)
-        {
-            return ExecDoSomeThings(tamaRequest,logger);
+            return ExecDoSomeThings(request);
         }
         [Obsolete]
-        public dynamic ExecCmd(RequestCmd tamaRequestCmd)
+        public dynamic ExecCmd(RequestCmd requestCmd)
         {
-            return ExecCommand(tamaRequestCmd).ToDynamic();
+            return ExecCommand(requestCmd).ToDynamic();
         }
         [Obsolete]
-        private async Task<dynamic> SendNotification(Message message,EnumNotificationType NotificationType,int UserId,ILogger<MainController> _logger)
+        private async Task<dynamic> SendNotification(Message message,int NotificationTypeId,int UserId)
         {
 
             //Save Notification To Database
-            List<Para>? paras = [];
-            paras.Add(new Para() { Name = "NotificationTypeId", Value = ((int)NotificationType).ToString(), DataType = SqlDbType.Int });
-            paras.Add(new Para() { Name = "UserId", Value = UserId.ToString(), DataType = SqlDbType.Int });
-            paras.Add(new Para() { Name="Title",Value=message.Notification.Title,DataType= SqlDbType.NVarChar });
-            paras.Add(new Para() { Name = "Body", Value = message.Notification.Body, DataType = SqlDbType.NVarChar });
-            if (message.Data != null) paras.Add(new Para() { Name = "Data", Value = JsonConvert.SerializeObject(message.Data), DataType = SqlDbType.NVarChar });
+            SpNotification.Insert(new InsNotification { 
+                NotificationTypeId = NotificationTypeId,
+                UserId = UserId,
+                Title = message.Notification.Title,
+                Body = message.Notification.Body,
+                Data = message.Data.ToString()
 
-            ExecSp(new Request() { SpName = "sp_Ins_Notification", Paras = paras });
-
+            });
             //Start To Send Notification
-            string serviceAccountKeyPath = Path.Combine(AppContext.BaseDirectory, "tamam-2acdd-firebase-adminsdk.json");
+            string serviceAccountKeyPath = Path.Combine(AppContext.BaseDirectory, "seiiarty-54af7-firebase-adminsdk.json");
 
             if (!File.Exists(serviceAccountKeyPath))
             {
-                logger.LogInformation($"XXX_SendNotification ===> Service account key file not found.");
+                
                 return new
                 {
                     MsgId = 2,
@@ -68,26 +63,9 @@ namespace TamaApi.Services.Main
 
             try
             {
-                if (FirebaseApp.DefaultInstance == null) { 
-                    FirebaseApp.Create(new AppOptions(){Credential = GoogleCredential.FromFile(serviceAccountKeyPath)});
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"XXX_SendNotification ===> Error initializing Firebase Admin SDK: {ex.Message}");
-                return new
-                {
-                    MsgId = 2,
-                    MsgAr = $"Error initializing Firebase Admin SDK: {ex.Message}",
-                    MsgEn = $"Error initializing Firebase Admin SDK: {ex.Message}",
-                };
-            }
-
-            try
-            {
                 // إرسال الرسالة
                 string responseDevice = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                logger.LogInformation($"Successfully sent message to device: {responseDevice}");
+                
 
                 return new
                 {
@@ -98,8 +76,6 @@ namespace TamaApi.Services.Main
             }
             catch (FirebaseMessagingException fcmEx)
             {
-                logger.LogError($"Firebase Messaging Error: {fcmEx.Message}");
-                logger.LogError($"Error Code: {fcmEx.MessagingErrorCode}");
                 return new
                 {
                     MsgId = 2,
@@ -110,16 +86,37 @@ namespace TamaApi.Services.Main
         }
 
         [Obsolete]
+        private async void sendToAdmins(ApiNotification apiNotification) {
+            Message message;
+            dynamic msgRes;
+            apiNotification.Data = [];
+            apiNotification.Data!.Add($"NotificationType", "1");
+
+            DataTable adminsTokens = GetNamaAdminsTokens();
+            foreach (DataRow row in adminsTokens.Rows)
+            {
+                apiNotification.Token = GetValueString(row, "FirebaseToken");
+                message = new Message()
+                {
+                    Notification = apiNotification.Notification,
+                    Data = apiNotification.Data,
+                    Token = apiNotification.Token
+                };
+                msgRes = await SendNotification(message, 1, GetValueInt(row, "ID"));
+            }
+        }
+        [Obsolete]
         DataTable GetNamaAdminsTokens() {
-            List<Para> paras = [ 
-                new Para(){ Name="TableName",Value="NamaAdmin",DataType= SqlDbType.NVarChar}
-            ];
-            DataTable tblNamaAdmin = ExecSp(new Request() {SpName= "sp_Get_Table",Paras=paras});
-            return tblNamaAdmin;
+            GetUser getUser = new GetUser()
+            {
+                Admin = true,
+            };
+            DataTable AdminTokens = SpUser.Get(getUser);
+            return AdminTokens;
         }
 
         [Obsolete]
-        public async Task<dynamic> Notification(ApiNotification apiNotification, ILogger<MainController> _logger)
+        public async Task<dynamic> Notification(ApiNotification apiNotification)
         {
             Message message;
             dynamic msgRes = new
@@ -128,23 +125,13 @@ namespace TamaApi.Services.Main
                 MsgAr = "تمام",
                 MsgEn = "تمام"
             };
+            
             switch (apiNotification.NotificationType) {
+                case EnumNotificationType.request:
+                    sendToAdmins(apiNotification);
+                    break;
                 case EnumNotificationType.contactUs:
-                    apiNotification.Data = [];
-                    apiNotification.Data!.Add($"NotificationType", ((int)EnumNotificationType.contactUs).ToString()!);
-                   
-                    DataTable adminsTokens = GetNamaAdminsTokens();
-                    foreach (DataRow row in adminsTokens.Rows)
-                    {
-                        apiNotification.Token = GetValueString(row, "firebaseToken");
-                        message = new Message()
-                        {
-                            Notification = apiNotification.Notification,
-                            Data = apiNotification.Data,
-                            Token = apiNotification.Token
-                        };
-                        msgRes=await SendNotification(message, EnumNotificationType.contactUs, GetValueInt(row, "UserId"), _logger);
-                    }
+                    sendToAdmins(apiNotification);
                     break;
             }
             return msgRes;
