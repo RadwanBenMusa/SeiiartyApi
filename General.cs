@@ -4,11 +4,46 @@ using System.Dynamic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Seiiarty.Services.db.DbService;
 
 namespace Seiiarty
 {
     public class General
     {
+        public static dynamic? GetPara(List<Para> paras, string name, dynamic? fallback = null)
+        {
+            string? raw = paras.FirstOrDefault(p =>
+                string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase))?.Value;
+
+            if (raw is null || string.IsNullOrWhiteSpace(raw.ToString()))
+                return fallback;
+
+            return raw;
+        }
+
+        /// <summary>Returns int? — null if param is missing or unparseable.</summary>
+        public static int? GetParaInt(List<Para> paras, string name)
+        {
+            dynamic? val = GetPara(paras, name);
+            if (val is null) return null;
+            return int.TryParse(val.ToString(), out int parsed) ? parsed : null;
+        }
+
+
+        public static bool? GetParaBool(List<Para> paras, string name)
+        {
+            dynamic? val = GetPara(paras, name);
+            if (val is null) return null;
+            return bool.TryParse(val.ToString(), out bool parsed) ? parsed : null;
+        }
+
+        /// <summary>Returns DateTime? — null if param is missing or unparseable.</summary>
+        public static DateTime? GetParaDate(List<Para> paras, string name)
+        {
+            dynamic? val = GetPara(paras, name);
+            if (val is null) return null;
+            return DateTime.TryParse(val.ToString(), out DateTime parsed) ? parsed : null;
+        }
         public static string CheckPhoneNumberOk(string phoneNo)
         {
             if (string.IsNullOrEmpty(phoneNo)) return "";

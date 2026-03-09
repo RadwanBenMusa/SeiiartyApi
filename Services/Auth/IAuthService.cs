@@ -1,12 +1,13 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Seiiarty.Controllers;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Seiiarty.Controllers;
+using static Seiiarty.Services.db.DbService;
 
 namespace Seiiarty.Services.Auth
 {
     public interface IAuthService
     {
-        public int User(UserData user);
+        public int Login(RequestSp requestSp);
         public bool CheckPhoneToken(int userId,string? PhoneToken); 
         public dynamic SendOTP(UserToSendOTP userToSendOTP);
         public dynamic VerifyOTP(UserToVerifyOTP userToVerifyOTP);

@@ -6,40 +6,7 @@ namespace Seiiarty.Services.Sp
 {
     public class SpService() : ISpService
     {
-        private static dynamic? GetPara(List<Para> paras, string name, dynamic? fallback = null)
-        {
-            string? raw = paras.FirstOrDefault(p =>
-                string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase))?.Value;
 
-            if (raw is null || string.IsNullOrWhiteSpace(raw.ToString()))
-                return fallback;
-
-            return raw;
-        }
-
-        /// <summary>Returns int? — null if param is missing or unparseable.</summary>
-        private static int? GetParaInt(List<Para> paras, string name)
-        {
-            dynamic? val = GetPara(paras, name);
-            if (val is null) return null;
-            return int.TryParse(val.ToString(), out int parsed) ? parsed : null;
-        }
-
-
-        private static bool? GetParaBool(List<Para> paras, string name)
-        {
-            dynamic? val = GetPara(paras, name);
-            if (val is null) return null;
-            return bool.TryParse(val.ToString(), out bool parsed) ? parsed : null;
-        }
-
-        /// <summary>Returns DateTime? — null if param is missing or unparseable.</summary>
-        private static DateTime? GetParaDate(List<Para> paras, string name)
-        {
-            dynamic? val = GetPara(paras, name);
-            if (val is null) return null;
-            return DateTime.TryParse(val.ToString(), out DateTime parsed) ? parsed : null;
-        }
 
         
         [Obsolete]
@@ -52,47 +19,47 @@ namespace Seiiarty.Services.Sp
                 case "Get":
                     result = SpCategory.Get(new GetCategory
                     {
-                        Id = GetParaInt(p, "Id"),
-                        CatTypeId = GetParaInt(p, "CatTypeId"),
+                        Id = General.GetParaInt(p, "Id"),
+                        CatTypeId = General.GetParaInt(p, "CatTypeId"),
                     });
                     break;
                 case "Insert":
                     result = SpCategory.Insert(new InsCategory
                     {
-                        CatNo = GetParaInt(p, "CatNo") ?? 0,
-                        Descrip = GetPara(p, "Descrip") ?? "",
-                        CatTypeId = GetParaInt(p, "CatTypeId") ?? 0,
+                        CatNo = General.GetParaInt(p, "CatNo") ?? 0,
+                        Descrip = General.GetPara(p, "Descrip") ?? "",
+                        CatTypeId = General.GetParaInt(p, "CatTypeId") ?? 0,
                     });
                     break;
                 case "Update":
                     result = SpCategory.Update(new UpdateCategory
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
-                        CatNo = GetParaInt(p, "CatNo"),
-                        Descrip = GetPara(p, "Descrip"),
-                        CatTypeId = GetParaInt(p, "CatTypeId"),
-                        Freeze = GetParaBool(p, "Freeze"),
-                        DeletionDate = GetParaDate(p, "DeletionDate"),
-                        RemoveDeletionDate = GetParaBool(p, "RemoveDeletionDate") ?? false,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                        CatNo = General.GetParaInt(p, "CatNo"),
+                        Descrip = General.GetPara(p, "Descrip"),
+                        CatTypeId = General.GetParaInt(p, "CatTypeId"),
+                        Freeze = General.GetParaBool(p, "Freeze"),
+                        DeletionDate = General.GetParaDate(p, "DeletionDate"),
+                        RemoveDeletionDate = General.GetParaBool(p, "RemoveDeletionDate") ?? false,
                     });
                     break;
                 case "Delete":
                     result = SpCategory.Delete(new DeleteCategory
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
                 case "SoftDelete":
-                    result = SpCategory.SoftDelete(GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Restore":
-                    result = SpCategory.Restore(GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Freeze":
-                    result = SpCategory.Freeze(GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.Freeze(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Unfreeze":
-                    result = SpCategory.Unfreeze(GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.Unfreeze(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
             return result;
@@ -109,70 +76,71 @@ namespace Seiiarty.Services.Sp
                 case "Get":
                     result = SpItem.Get(new GetItem
                     {
-                        Id = GetParaInt(p, "Id"),
-                        CategoryId = GetParaInt(p, "CategoryId"),
-                        Name = GetPara(p, "Name"),
-                        IsFrozen = GetParaBool(p, "IsFrozen"),
-                        IsDeleted = GetParaBool(p, "IsDeleted"),
-                        CatTypeId = GetParaInt(p, "CatTypeId"),
+                        Id = General.GetParaInt(p, "Id"),
+                        CategoryId = General.GetParaInt(p, "CategoryId"),
+                        Name = General.GetPara(p, "Name"),
+                        IsFrozen = General.GetParaBool(p, "IsFrozen"),
+                        IsDeleted = General.GetParaBool(p, "IsDeleted"),
+                        CatTypeId = General.GetParaInt(p, "CatTypeId"),
                     });
                     break;
                 case "GetNextItemNo":
                     result = SpItem.GetNextItemNo(
-                        categoryId: GetParaInt(p, "CategoryId") ?? 0,
-                        catNo: GetParaInt(p, "CatNo") ?? 0
+                        categoryId: General.GetParaInt(p, "CategoryId") ?? 0,
+                        catNo: General.GetParaInt(p, "CatNo") ?? 0
                     );
                     break;
                 case "GetLastItemNo":
                     result = SpItem.GetLastItemNo(
-                        categoryId: GetParaInt(p, "CategoryId") ?? 0
+                        categoryId: General.GetParaInt(p, "CategoryId") ?? 0
                     );
                     break;
                 case "Insert":
                     result = SpItem.Insert(new InsItem
                     {
-                        ItemNo = GetParaInt(p, "ItemNo") ?? 0,
-                        Name = GetPara(p, "Name") ?? "",
-                        EName = GetPara(p, "EName") ?? "",
-                        Descrip = GetPara(p, "Descrip") ?? "",
-                        CategoryId = GetParaInt(p, "CategoryId") ?? 0,
+                        ItemNo = General.GetParaInt(p, "ItemNo") ?? 0,
+                        Name = General.GetPara(p, "Name") ?? "",
+                        EName = General.GetPara(p, "EName") ?? "",
+                        Descrip = General.GetPara(p, "Descrip") ?? "",
+                        CategoryId = General.GetParaInt(p, "CategoryId") ?? 0,
                     });
                     break;
                 case "Update":
                     result = SpItem.Update(new UpdateItem
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
-                        ItemNo = GetParaInt(p, "ItemNo"),
-                        Name = GetPara(p, "Name"),
-                        EName = GetPara(p, "EName"),
-                        Descrip = GetPara(p, "Descrip"),
-                        CategoryId = GetParaInt(p, "CategoryId"),
-                        Freeze = GetParaBool(p, "Freeze"),
-                        DeletionDate = GetParaDate(p, "DeletionDate"),
-                        RemoveDeletionDate = GetParaBool(p, "RemoveDeletionDate") ?? false,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                        ItemNo = General.GetParaInt(p, "ItemNo"),
+                        Name = General.GetPara(p, "Name"),
+                        EName = General.GetPara(p, "EName"),
+                        Descrip = General.GetPara(p, "Descrip"),
+                        CategoryId = General.GetParaInt(p, "CategoryId"),
+                        Freeze = General.GetParaBool(p, "Freeze"),
+                        DeletionDate = General.GetParaDate(p, "DeletionDate"),
+                        RemoveDeletionDate = General.GetParaBool(p, "RemoveDeletionDate") ?? false,
                     });
                     break;
                 case "Delete":
                     result = SpItem.Delete(new DeleteItem
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
                 case "SoftDelete":
-                    result = SpItem.SoftDelete(GetParaInt(p, "Id") ?? 0);
+                    result = SpItem.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Restore":
-                    result = SpItem.Restore(GetParaInt(p, "Id") ?? 0);
+                    result = SpItem.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Freeze":
-                    result = SpItem.Freeze(GetParaInt(p, "Id") ?? 0);
+                    result = SpItem.Freeze(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Unfreeze":
-                    result = SpItem.Unfreeze(GetParaInt(p, "Id") ?? 0);
+                    result = SpItem.Unfreeze(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
             return result;
         }
+
 
         [Obsolete]
         public dynamic DoSpNotification(RequestSp requestSp)
@@ -185,38 +153,38 @@ namespace Seiiarty.Services.Sp
                 case "Get":
                     result = SpNotification.Get(new GetNotification
                     {
-                        Id = GetParaInt(p, "Id"),
-                        NotificationTypeId = GetParaInt(p, "NotificationTypeId"),
-                        UserId = GetParaInt(p, "UserId"),
-                        Readed = GetParaBool(p, "Readed"),
+                        Id = General.GetParaInt(p, "Id"),
+                        NotificationTypeId = General.GetParaInt(p, "NotificationTypeId"),
+                        UserId = General.GetParaInt(p, "UserId"),
+                        Readed = General.GetParaBool(p, "Readed"),
                     });
                     break;
                 case "Insert":
                     result = SpNotification.Insert(new InsNotification
                     {
-                        NotificationTypeId = GetPara(p, "NotificationTypeId") ?? 0,
-                        UserId = GetParaInt(p, "UserId"),
-                        Title = GetPara(p, "Title"),
-                        Body = GetPara(p, "Body"),
-                        Data = GetPara(p, "Data"),
+                        NotificationTypeId = General.GetPara(p, "NotificationTypeId") ?? 0,
+                        UserId = General.GetParaInt(p, "UserId"),
+                        Title = General.GetPara(p, "Title"),
+                        Body = General.GetPara(p, "Body"),
+                        Data = General.GetPara(p, "Data"),
                     });
                     break;
                 case "Update":
                     result = SpNotification.Update(new UpdateNotification
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
-                        NotificationTypeId = GetParaInt(p, "NotificationTypeId"),
-                        UserId = GetParaInt(p, "UserId"),
-                        Title = GetPara(p, "Title"),
-                        Body = GetPara(p, "Body"),
-                        Data = GetPara(p, "Data"),
-                        Readed = GetParaBool(p, "Readed"),
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                        NotificationTypeId = General.GetParaInt(p, "NotificationTypeId"),
+                        UserId = General.GetParaInt(p, "UserId"),
+                        Title = General.GetPara(p, "Title"),
+                        Body = General.GetPara(p, "Body"),
+                        Data = General.GetPara(p, "Data"),
+                        Readed = General.GetParaBool(p, "Readed"),
                     });
                     break;
                 case "MarkAsRead":
                     result = SpNotification.Update(new UpdateNotification
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                         Readed = true,
                     });
                     break;
@@ -250,11 +218,11 @@ namespace Seiiarty.Services.Sp
                 case "Get":
                     result = SpStore.Get(new GetStore
                     {
-                        Id = GetParaInt(p, "Id"),
-                        Name = GetPara(p, "Name"),
-                        StoreTypeId = GetParaInt(p, "StoreTypeId"),
-                        UserRequestId = GetParaInt(p, "UserRequestId"),
-                        Status = GetPara(p, "Status") is string s
+                        Id = General.GetParaInt(p, "Id"),
+                        Name = General.GetPara(p, "Name"),
+                        StoreTypeId = General.GetParaInt(p, "StoreTypeId"),
+                        UserRequestId = General.GetParaInt(p, "UserRequestId"),
+                        Status = General.GetPara(p, "Status") is string s
                                         ? Enum.TryParse<StoreStatus>(s, out var st) ? st : null
                                         : null,
                     });
@@ -262,44 +230,44 @@ namespace Seiiarty.Services.Sp
                 case "Insert":
                     result = SpStore.Insert(new InsStore
                     {
-                        Name = GetPara(p, "Name") ?? "",
-                        Descrip = GetPara(p, "Descrip") ?? "",
-                        Location = GetPara(p, "Location") ?? "",
-                        StoreTypeId = GetParaInt(p, "StoreTypeId") ?? 0,
-                        UserRequestId = GetParaInt(p, "UserRequestId") ?? 0,
+                        Name = General.GetPara(p, "Name") ?? "",
+                        Descrip = General.GetPara(p, "Descrip") ?? "",
+                        Location = General.GetPara(p, "Location") ?? "",
+                        StoreTypeId = General.GetParaInt(p, "StoreTypeId") ?? 0,
+                        UserRequestId = General.GetParaInt(p, "UserRequestId") ?? 0,
                     });
                     break;
                 case "Update":
                     result = SpStore.Update(new UpdateStore
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
-                        Name = GetPara(p, "Name"),
-                        Descrip = GetPara(p, "Descrip"),
-                        Location = GetPara(p, "Location"),
-                        StoreTypeId = GetParaInt(p, "StoreTypeId"),
-                        ExpiredDate = GetParaDate(p, "ExpiredDate"),
-                        RemoveExpiredDate = GetParaBool(p, "RemoveExpiredDate") ?? false,
-                        DeletionDate = GetParaDate(p, "DeletionDate"),
-                        RemoveDeletionDate = GetParaBool(p, "RemoveDeletionDate") ?? false,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                        Name = General.GetPara(p, "Name"),
+                        Descrip = General.GetPara(p, "Descrip"),
+                        Location = General.GetPara(p, "Location"),
+                        StoreTypeId = General.GetParaInt(p, "StoreTypeId"),
+                        ExpiredDate = General.GetParaDate(p, "ExpiredDate"),
+                        RemoveExpiredDate = General.GetParaBool(p, "RemoveExpiredDate") ?? false,
+                        DeletionDate = General.GetParaDate(p, "DeletionDate"),
+                        RemoveDeletionDate = General.GetParaBool(p, "RemoveDeletionDate") ?? false,
                     });
                     break;
                 case "Delete":
                     result = SpStore.Delete(new DeleteStore
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
                 case "Approve":
-                    result = SpStore.Approve(GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.Approve(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "RevokeApproval":
-                    result = SpStore.RevokeApproval(GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.RevokeApproval(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "SoftDelete":
-                    result = SpStore.SoftDelete(GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Restore":
-                    result = SpStore.Restore(GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
             return result;
@@ -316,26 +284,26 @@ namespace Seiiarty.Services.Sp
                 case "Get":
                     result = SpStoreType.Get(new GetStoreType
                     {
-                        Id = GetParaInt(p, "Id"),
+                        Id = General.GetParaInt(p, "Id"),
                     });
                     break;
                 case "Insert":
                     result = SpStoreType.Insert(new InsStoreType
                     {
-                        Descrip = GetPara(p, "Descrip") ?? "",
+                        Descrip = General.GetPara(p, "Descrip") ?? "",
                     });
                     break;
                 case "Update":
                     result = SpStoreType.Update(new UpdateStoreType
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
-                        Descrip = GetPara(p, "Descrip"),
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                        Descrip = General.GetPara(p, "Descrip"),
                     });
                     break;
                 case "Delete":
                     result = SpStoreType.Delete(new DeleteStoreType
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
             }
@@ -353,38 +321,38 @@ namespace Seiiarty.Services.Sp
                 case "Get":
                     result = SpStoreUser.Get(new GetStoreUser
                     {
-                        Id = GetParaInt(p, "Id"),
-                        StoreId = GetParaInt(p, "StoreId"),
-                        UserId = GetParaInt(p, "UserId"),
-                        WithDeleted = GetParaBool(p, "WithDeleted") ?? false,
+                        Id = General.GetParaInt(p, "Id"),
+                        StoreId = General.GetParaInt(p, "StoreId"),
+                        UserId = General.GetParaInt(p, "UserId"),
+                        WithDeleted = General.GetParaBool(p, "WithDeleted") ?? false,
                     });
                     break;
                 case "Insert":
                     result = SpStoreUser.Insert(new InsStoreUser
                     {
-                        StoreId = GetParaInt(p, "StoreId") ?? 0,
-                        UserId = GetParaInt(p, "UserId") ?? 0,
+                        StoreId = General.GetParaInt(p, "StoreId") ?? 0,
+                        UserId = General.GetParaInt(p, "UserId") ?? 0,
                     });
                     break;
                 case "Update":
                     result = SpStoreUser.Update(new UpdateStoreUser
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
-                        DeletionDate = GetParaDate(p, "DeletionDate"),
-                        RemoveDeletionDate = GetParaBool(p, "RemoveDeletionDate") ?? false,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                        DeletionDate = General.GetParaDate(p, "DeletionDate"),
+                        RemoveDeletionDate = General.GetParaBool(p, "RemoveDeletionDate") ?? false,
                     });
                     break;
                 case "Delete":
                     result = SpStoreUser.Delete(new DeleteStoreUser
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
                 case "SoftDelete":
-                    result = SpStoreUser.SoftDelete(GetParaInt(p, "Id") ?? 0);
+                    result = SpStoreUser.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Restore":
-                    result = SpStoreUser.Restore(GetParaInt(p, "Id") ?? 0);
+                    result = SpStoreUser.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
             return result;
@@ -400,52 +368,52 @@ namespace Seiiarty.Services.Sp
                 case "Get":
                     result = SpUser.Get(new GetUser
                     {
-                        Id = GetParaInt(p, "Id"),
-                        PhoneNo = GetPara(p, "PhoneNo"),
-                        ExcludeStoreId = GetParaInt(p, "ExcludeStoreId"),
-                        WithDeletionDate = GetParaBool(p, "WithDeletionDate") ?? false,
+                        Id = General.GetParaInt(p, "Id"),
+                        PhoneNo = General.GetPara(p, "PhoneNo"),
+                        ExcludeStoreId = General.GetParaInt(p, "ExcludeStoreId"),
+                        WithDeletionDate = General.GetParaBool(p, "WithDeletionDate") ?? false,
                     });
                     break;
                 case "Insert":
                     result = SpUser.Insert(new InsUser
                     {
-                        Name = GetPara(p, "Name") ?? "",
-                        PhoneNumber = GetPara(p, "PhoneNumber") ?? "",
-                        Password = GetPara(p, "Password") ?? "",
-                        FirebaseToken = GetPara(p, "FirebaseToken"),
+                        Name = General.GetPara(p, "Name") ?? "",
+                        PhoneNumber = General.GetPara(p, "PhoneNumber") ?? "",
+                        Password = General.GetPara(p, "Password") ?? "",
+                        FirebaseToken = General.GetPara(p, "FirebaseToken"),
                     });
                     break;
                 case "Update":
                     result = SpUser.Update(new UpdateUser
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
-                        FullName = GetPara(p, "FullName"),
-                        PhoneNumber = GetPara(p, "PhoneNumber"),
-                        Password = GetPara(p, "Password"),
-                        FirebaseToken = GetPara(p, "FirebaseToken"),
-                        LastLogin = GetParaDate(p, "LastLogin"),
-                        Admin = GetParaBool(p, "Admin") ?? false,
-                        DeletionDate = GetParaDate(p, "DeletionDate"),
-                        RemoveDeletionDate = GetParaBool(p, "RemoveDeletionDate") ?? false,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                        FullName = General.GetPara(p, "FullName"),
+                        PhoneNumber = General.GetPara(p, "PhoneNumber"),
+                        Password = General.GetPara(p, "Password"),
+                        FirebaseToken = General.GetPara(p, "FirebaseToken"),
+                        LastLogin = General.GetParaDate(p, "LastLogin"),
+                        Admin = General.GetParaBool(p, "Admin") ?? false,
+                        DeletionDate = General.GetParaDate(p, "DeletionDate"),
+                        RemoveDeletionDate = General.GetParaBool(p, "RemoveDeletionDate") ?? false,
                     });
                     break;
                 case "Delete":
                     result = SpUser.Delete(new DeleteUser
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
                 case "SoftDelete":
                     result = SpUser.Update(new UpdateUser
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                         DeletionDate = DateTime.Now,
                     });
                     break;
                 case "Restore":
                     result = SpUser.Update(new UpdateUser
                     {
-                        Id = GetParaInt(p, "Id") ?? 0,
+                        Id = General.GetParaInt(p, "Id") ?? 0,
                         RemoveDeletionDate = true,
                     });
                     break;

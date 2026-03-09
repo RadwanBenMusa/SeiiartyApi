@@ -1,15 +1,16 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.Data;
-using Seiiarty.Controllers;
-using static Seiiarty.Services.db.DbService;
-using System.Text;
-using System.Security.Cryptography;
-using static Seiiarty.General;
 using RestSharp;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
+using Seiiarty.Controllers;
 using Seiiarty.Services.db;
+using Seiiarty.StoredProcedures;
+using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using static Seiiarty.General;
+using static Seiiarty.Services.db.DbService;
 
 namespace Seiiarty.Services.Auth
 {
@@ -76,27 +77,69 @@ namespace Seiiarty.Services.Auth
         }
 
         [Obsolete]
-        public int User(UserData user)
+        public int Login(RequestSp requestSp)
         {
-            
-            DataTable dtUser = ExecCommand(new RequestCmd() { Cmd = $"Select * from [User] where PhoneNumber = {user.PhoneNumber} And DeletionDate = null" });
-            //DataTable dtUser = JsonConvert.DeserializeObject<DataTable>(msgRes.Data!)!;
-            if (dtUser.Rows.Count > 0)
-            {
-                string dbPasssword = "";
-                if (dtUser.Rows[0]["Password"] != DBNull.Value)
-                    dbPasssword = (string)dtUser.Rows[0]["Password"];
-                if (user.Password == Decrypt(dbPasssword)) {
-                    int userId = (int)dtUser.Rows[0]["Id"];
-                    string lastLogin= $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day} {DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}";
-                    string cmd = $"Update [User] Set lastLogin='{lastLogin}' Where ID={userId}";
-                    ExecCommand(new RequestCmd() { Cmd = cmd });
-                    return userId;
-                }
-            }
 
-            return 0;
-            //throw new NotImplementedException();
+            {
+                dynamic result = "";
+                var p = requestSp.Paras ?? [];
+                switch (requestSp.Method)
+                {
+                    case "Get":
+                        result = SpUser.Get(new GetUser
+                        {
+                            Id = GetParaInt(p, "Id"),
+                            PhoneNo = GetPara(p, "PhoneNo"),
+                            ExcludeStoreId = GetParaInt(p, "ExcludeStoreId"),
+                            WithDeletionDate = GetParaBool(p, "WithDeletionDate") ?? false,
+                        });
+                        break;
+                    case "Insert":
+                        result = SpUser.Insert(new InsUser
+                        {
+                            Name = GetPara(p, "Name") ?? "",
+                            PhoneNumber = GetPara(p, "PhoneNumber") ?? "",
+                            Password = GetPara(p, "Password") ?? "",
+                            FirebaseToken = GetPara(p, "FirebaseToken"),
+                        });
+                        break;
+                    case "Update":
+                        result = SpUser.Update(new UpdateUser
+                        {
+                            Id = GetParaInt(p, "Id") ?? 0,
+                            FullName = GetPara(p, "FullName"),
+                            PhoneNumber = GetPara(p, "PhoneNumber"),
+                            Password = GetPara(p, "Password"),
+                            FirebaseToken = GetPara(p, "FirebaseToken"),
+                            LastLogin = GetParaDate(p, "LastLogin"),
+                            Admin = GetParaBool(p, "Admin") ?? false,
+                            DeletionDate = GetParaDate(p, "DeletionDate"),
+                            RemoveDeletionDate = GetParaBool(p, "RemoveDeletionDate") ?? false,
+                        });
+                        break;
+                    case "Delete":
+                        result = SpUser.Delete(new DeleteUser
+                        {
+                            Id = GetParaInt(p, "Id") ?? 0,
+                        });
+                        break;
+                    case "SoftDelete":
+                        result = SpUser.Update(new UpdateUser
+                        {
+                            Id = GetParaInt(p, "Id") ?? 0,
+                            DeletionDate = DateTime.Now,
+                        });
+                        break;
+                    case "Restore":
+                        result = SpUser.Update(new UpdateUser
+                        {
+                            Id = GetParaInt(p, "Id") ?? 0,
+                            RemoveDeletionDate = true,
+                        });
+                        break;
+                }
+                return result;
+            }
         }
 
         static readonly string ApiKey = "78512214deafed6a";
@@ -267,11 +310,7 @@ namespace Seiiarty.Services.Auth
             }
         }
 
-        [Obsolete]
-        public dynamic GetSetupTable() 
-        {
-            return DbService.GetSetupTable();
-        }
+
 
         [Obsolete]
         public JwtSecurityToken GetToken(List<Claim> authClaims, bool? forResetOrRegister = false,int? ExpiredTokenMinutes=0)

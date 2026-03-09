@@ -10,9 +10,7 @@ namespace Seiiarty.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-#if !DEBUG
-    [Authorize]
-#endif
+
 
     public class SpController(IConfiguration config, ISpService spService) : ControllerBase
     {
@@ -20,14 +18,18 @@ namespace Seiiarty.Controllers
 
         private readonly ISpService _spService = spService;
 
-        [HttpPost("Category")]
+#if DEBUG
+    [HttpPost("Category")]
+#else
+    [HttpPost("Category"), Authorize]
+#endif
+
         public IActionResult Category(RequestSp requestSp)
         {
             try
             {
 
                 dynamic msgRes = _spService.DoSpCategory(requestSp);
-                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -36,15 +38,18 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
-
+#if DEBUG
         [HttpPost("Item")]
+#else
+        [HttpPost("Item"), Authorize]
+#endif
+        
         public IActionResult Item(RequestSp requestSp)
         {
             try
             {
 
                 dynamic msgRes = _spService.DoSpItem(requestSp);
-                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -53,8 +58,12 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
-
+#if DEBUG
         [HttpPost("Notification")]
+#else
+        [HttpPost("Notification"), Authorize]
+#endif
+        
         public IActionResult Notification(RequestSp requestSp)
         {
             try
@@ -75,7 +84,6 @@ namespace Seiiarty.Controllers
             {
 
                 dynamic msgRes = _spService.DoSpSetupTable(requestSp);
-                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -84,15 +92,18 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
-
+#if DEBUG
         [HttpPost("Store")]
+#else
+        [HttpPost("Store"), Authorize]
+#endif
+        
         public IActionResult Store(RequestSp requestSp)
         {
             try
             {
 
                 dynamic msgRes = _spService.DoSpStore(requestSp);
-                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -101,15 +112,18 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
-
+#if DEBUG
         [HttpPost("StoreType")]
+#else
+        [HttpPost("StoreType"), Authorize]
+#endif
+        
         public IActionResult StoreType(RequestSp requestSp)
         {
             try
             {
 
                 dynamic msgRes = _spService.DoSpStoreType(requestSp);
-                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -118,15 +132,18 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
-
+#if DEBUG
         [HttpPost("StoreUser")]
+#else
+        [HttpPost("StoreUser"), Authorize]
+#endif
+
         public IActionResult StoreUser(RequestSp requestSp)
         {
             try
             {
 
                 dynamic msgRes = _spService.DoSpStoreUser(requestSp);
-                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -135,15 +152,18 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
-
+#if DEBUG
         [HttpPost("User")]
+#else
+        [HttpPost("User"), Authorize]
+#endif
+
         public IActionResult User(RequestSp requestSp)
         {
             try
             {
 
                 dynamic msgRes = _spService.DoSpUser(requestSp);
-                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
