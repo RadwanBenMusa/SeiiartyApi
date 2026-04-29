@@ -1,118 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="bin\Debug\net8.0\appsettings.Development.json" />
-    <Content Include="bin\Debug\net8.0\appsettings.json" />
-    <Content Include="bin\Debug\net8.0\Seiiarty.deps.json" />
-    <Content Include="bin\Debug\net8.0\Seiiarty.runtimeconfig.json" />
-    <Content Include="bin\Release\net8.0\appsettings.Development.json" />
-    <Content Include="bin\Release\net8.0\appsettings.json" />
-    <Content Include="bin\Release\net8.0\Seiiarty.deps.json" />
-    <Content Include="bin\Release\net8.0\Seiiarty.runtimeconfig.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FirebaseAdmin" Version="3.5.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="RestSharp" Version="112.1.0" />
+		<PackageReference Include="Serilog" Version="4.1.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+		<PackageReference Include="System.Management" Version="10.0.1" />
+		<PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+		<PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+		<PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.8" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll" />
-    <None Include="bin\Debug\net8.0\Microsoft.OpenApi.dll" />
-    <None Include="bin\Debug\net8.0\Newtonsoft.Json.dll" />
-    <None Include="bin\Debug\net8.0\RestSharp.dll" />
-    <None Include="bin\Debug\net8.0\runtimes\unix\lib\net8.0\System.Data.SqlClient.dll" />
-    <None Include="bin\Debug\net8.0\runtimes\win-arm64\native\sni.dll" />
-    <None Include="bin\Debug\net8.0\runtimes\win-x64\native\sni.dll" />
-    <None Include="bin\Debug\net8.0\runtimes\win-x86\native\sni.dll" />
-    <None Include="bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.AspNetCore.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.Extensions.Hosting.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.Extensions.Logging.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.Formatting.Compact.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.Settings.Configuration.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.Sinks.Console.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.Sinks.Debug.dll" />
-    <None Include="bin\Debug\net8.0\Serilog.Sinks.File.dll" />
-    <None Include="bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll" />
-    <None Include="bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll" />
-    <None Include="bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll" />
-    <None Include="bin\Debug\net8.0\System.Data.SqlClient.dll" />
-    <None Include="bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll" />
-    <None Include="bin\Debug\net8.0\Seiiarty.dll" />
-    <None Include="bin\Debug\net8.0\Seiiarty.exe" />
-    <None Include="bin\Debug\net8.0\Seiiarty.pdb" />
-    <None Include="bin\Release\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.Extensions.DependencyModel.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.IdentityModel.Abstractions.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.IdentityModel.Logging.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.IdentityModel.Protocols.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.IdentityModel.Tokens.dll" />
-    <None Include="bin\Release\net8.0\Microsoft.OpenApi.dll" />
-    <None Include="bin\Release\net8.0\Newtonsoft.Json.dll" />
-    <None Include="bin\Release\net8.0\RestSharp.dll" />
-    <None Include="bin\Release\net8.0\runtimes\unix\lib\net8.0\System.Data.SqlClient.dll" />
-    <None Include="bin\Release\net8.0\runtimes\win-arm64\native\sni.dll" />
-    <None Include="bin\Release\net8.0\runtimes\win-x64\native\sni.dll" />
-    <None Include="bin\Release\net8.0\runtimes\win-x86\native\sni.dll" />
-    <None Include="bin\Release\net8.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll" />
-    <None Include="bin\Release\net8.0\Serilog.AspNetCore.dll" />
-    <None Include="bin\Release\net8.0\Serilog.dll" />
-    <None Include="bin\Release\net8.0\Serilog.Extensions.Hosting.dll" />
-    <None Include="bin\Release\net8.0\Serilog.Extensions.Logging.dll" />
-    <None Include="bin\Release\net8.0\Serilog.Formatting.Compact.dll" />
-    <None Include="bin\Release\net8.0\Serilog.Settings.Configuration.dll" />
-    <None Include="bin\Release\net8.0\Serilog.Sinks.Console.dll" />
-    <None Include="bin\Release\net8.0\Serilog.Sinks.Debug.dll" />
-    <None Include="bin\Release\net8.0\Serilog.Sinks.File.dll" />
-    <None Include="bin\Release\net8.0\Swashbuckle.AspNetCore.Swagger.dll" />
-    <None Include="bin\Release\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll" />
-    <None Include="bin\Release\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll" />
-    <None Include="bin\Release\net8.0\System.Data.SqlClient.dll" />
-    <None Include="bin\Release\net8.0\System.IdentityModel.Tokens.Jwt.dll" />
-    <None Include="bin\Release\net8.0\Seiiarty.dll" />
-    <None Include="bin\Release\net8.0\Seiiarty.exe" />
-    <None Include="bin\Release\net8.0\Seiiarty.pdb" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Controllers\" />
+		<Folder Include="General\" />
+		<Folder Include="Services\" />
+		<Folder Include="StoredProcedures\" />
+		<Folder Include="clsMod\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FirebaseAdmin" Version="3.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RestSharp" Version="112.1.0" />
-    <PackageReference Include="Serilog" Version="4.1.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
-    <PackageReference Include="System.Management" Version="10.0.1" />
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
-    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
-    <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.8" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="General\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="seiiarty-54af7-firebase-adminsdk.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Update="seiiarty-54af7-firebase-adminsdk.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 </Project>

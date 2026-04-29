@@ -3,20 +3,12 @@ using static Seiiarty.Services.db.DbService;
 
 namespace Seiiarty.StoredProcedures
 {
-    // ── REQUEST CLASSES ───────────────────────────────────────────
-
-    public class GetSetupTable
-    {
-        // no filters needed for now
-    }
-
-    // ── SP CLASS ──────────────────────────────────────────────────
 
     public class SpSetupTable
     {
         // ── GET ──────────────────────────────────────────────────
         [Obsolete]
-        public static dynamic Get(GetSetupTable get)
+        public static dynamic Get()
         {
             string cmd = "SELECT * FROM SetupTable";
 

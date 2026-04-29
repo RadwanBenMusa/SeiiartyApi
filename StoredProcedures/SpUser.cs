@@ -9,10 +9,10 @@ namespace Seiiarty.StoredProcedures
 
     public class InsUser
     {
-        public required string Name { get; set; }
+        public required string FullName { get; set; }
         public required string PhoneNumber { get; set; }
         public required string Password { get; set; }
-        public string? FirebaseToken { get; set; }
+        public string? PhoneToken { get; set; }
     }
 
     public class GetUser
@@ -21,6 +21,7 @@ namespace Seiiarty.StoredProcedures
         public string? PhoneNo { get; set; }
         public bool? Admin { get; set; }
         public int? ExcludeStoreId { get; set; }
+        public bool? HasStore { get; set; }
         public bool WithDeletionDate { get; set; } = false;
     }
 
@@ -31,6 +32,7 @@ namespace Seiiarty.StoredProcedures
         public string? FullName { get; set; }
         public string? Password { get; set; }
         public string? FirebaseToken { get; set; }
+        public string? PhoneToken { get; set; }
         public DateTime? LastLogin { get; set; }
         public bool Admin { get; set; } = false;
         public DateTime? DeletionDate { get; set; }
@@ -53,10 +55,14 @@ namespace Seiiarty.StoredProcedures
             var conditions = new List<string>();
 
             if (!get.WithDeletionDate)
+            { 
                 conditions.Add("[User].DeletionDate IS NULL");
+            }
 
             if (get.Id != null)
+            { 
                 conditions.Add($"[User].ID = {get.Id}");
+            }
 
             if (get.PhoneNo != null)
             {
@@ -65,14 +71,17 @@ namespace Seiiarty.StoredProcedures
             }
 
             if (get.Admin != null)
+            { 
                 conditions.Add($"[User].Admin = {(get.Admin.Value ? 1 : 0)}");
-
+            }
+            if (get.HasStore == true)
+            {
+                conditions.Add($"EXISTS (SELECT 1 FROM StoreUser WHERE StoreUser.UserId = [User].ID AND StoreUser.DeletionDate IS NULL)");
+            }
             if (get.ExcludeStoreId != null)
-                conditions.Add(
-                    $"[User].ID NOT IN (" +
-                    $"SELECT UserId FROM StoreUser " +
-                    $"WHERE StoreId = {get.ExcludeStoreId} " +
-                    $"AND DeletionDate IS NULL)");
+            {
+                conditions.Add($"[User].ID NOT IN (SELECT UserId FROM StoreUser WHERE StoreId = {get.ExcludeStoreId} AND DeletionDate IS NULL)");
+            }
 
             string where = conditions.Count == 0
                 ? ""
@@ -92,10 +101,12 @@ namespace Seiiarty.StoredProcedures
             string now = General.ToSqlDate(DateTime.Now);
 
             string cmd =
-                $"INSERT INTO [User] (FullName, PhoneNumber, Password, FirebaseToken, CreationDate) " +
-                $"VALUES ('{ins.Name}', '{ins.PhoneNumber}', '{ins.Password}', '{ins.FirebaseToken}', '{now}')";
+                $"INSERT INTO [User] (FullName, PhoneNumber, Password, PhoneToken, CreationDate) " +
+                $"VALUES ('{ins.FullName}', '{ins.PhoneNumber}', '{ins.Password}', '{ins.PhoneToken}', '{now}'); " +
+                $"SELECT SCOPE_IDENTITY() AS ID;";
+            DataTable result = ExecCommand(new RequestCmd { Cmd = cmd });
 
-            return ExecCommand(new RequestCmd { Cmd = cmd });
+            return int.Parse(result.Rows[0]["ID"].ToString()!);
         }
 
         // ── UPDATE ────────────────────────────────────────────────
@@ -108,6 +119,7 @@ namespace Seiiarty.StoredProcedures
             if (upd.FullName != null     ) setParts.Add($"FullName      = '{upd.FullName.Trim()}'");
             if (upd.Password != null     ) setParts.Add($"Password      = '{upd.Password}'");
             if (upd.FirebaseToken != null) setParts.Add($"FirebaseToken = '{upd.FirebaseToken}'");
+            if (upd.PhoneToken != null   ) setParts.Add($"PhoneToken    = '{upd.PhoneToken}'");
             if (upd.LastLogin != null    ) setParts.Add($"LastLogin     = '{General.ToSqlDate(upd.LastLogin.Value)}'");
             if (upd.Admin                ) setParts.Add($"Admin         = 1");
             if (upd.DeletionDate != null ) setParts.Add($"DeletionDate  = '{General.ToSqlDate(upd.DeletionDate.Value)}'");

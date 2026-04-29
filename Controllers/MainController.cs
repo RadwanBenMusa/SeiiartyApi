@@ -77,7 +77,23 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
+       
+        [HttpPost("TestAuth"),Authorize]
+        public IActionResult TestAuth()
+        {
+            try
+            {
 
+                string msgRes = "Tamam Mya Mya";
+                //_logger.LogInformation($"XXX_ExecCmd===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
+                return StatusCode(StatusCodes.Status200OK, msgRes);
+            }
+            catch (Exception Ex)
+            {
+
+                return Error(Ex);
+            }
+        }
         private IActionResult Error(Exception Ex)
         {
             if (Ex.Source == "Seiiarty")

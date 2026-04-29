@@ -18,37 +18,6 @@ namespace Seiiarty.Services.Auth
     {
         public IConfiguration Configuration { get; } = config;
 
-        public const string key = "HiSaiidMusa195$$";
-
-        public static string Encrypt(string password)
-        {
-            using Aes aesAlg = Aes.Create();
-            aesAlg.Key = Encoding.UTF8.GetBytes(key);
-            aesAlg.IV = new byte[16];
-            ICryptoTransform cryptoTransform = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-            using MemoryStream memoryStream = new();
-            using (CryptoStream cryptoStream = new(memoryStream, cryptoTransform, CryptoStreamMode.Write))
-            {
-                using StreamWriter streamWriter = new(cryptoStream);
-                streamWriter.Write(password);
-            }
-            return Convert.ToBase64String(memoryStream.ToArray());
-        }
-
-        public static string Decrypt(string encryptedTxt)
-        {
-            using Aes aesAlg = Aes.Create();
-            aesAlg.Key = Encoding.UTF8.GetBytes(key);
-            aesAlg.IV = new byte[16];
-            ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-            using MemoryStream msDecrypt = new(Convert.FromBase64String(encryptedTxt));
-            using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
-            using StreamReader srDecrypt = new(csDecrypt);
-            return srDecrypt.ReadToEnd();
-        }
-
         [Obsolete]
         public bool CheckPhoneToken(int userId,string? PhoneToken)
         {
@@ -77,69 +46,212 @@ namespace Seiiarty.Services.Auth
         }
 
         [Obsolete]
-        public int Login(RequestSp requestSp)
+        public dynamic Auth(RequestSp requestSp)
         {
+            dynamic result = "";
+            var p = requestSp.Paras ?? [];
 
+            switch (requestSp.Method)
             {
-                dynamic result = "";
-                var p = requestSp.Paras ?? [];
-                switch (requestSp.Method)
-                {
-                    case "Get":
-                        result = SpUser.Get(new GetUser
-                        {
-                            Id = GetParaInt(p, "Id"),
-                            PhoneNo = GetPara(p, "PhoneNo"),
-                            ExcludeStoreId = GetParaInt(p, "ExcludeStoreId"),
-                            WithDeletionDate = GetParaBool(p, "WithDeletionDate") ?? false,
-                        });
-                        break;
-                    case "Insert":
-                        result = SpUser.Insert(new InsUser
-                        {
-                            Name = GetPara(p, "Name") ?? "",
-                            PhoneNumber = GetPara(p, "PhoneNumber") ?? "",
-                            Password = GetPara(p, "Password") ?? "",
-                            FirebaseToken = GetPara(p, "FirebaseToken"),
-                        });
-                        break;
-                    case "Update":
-                        result = SpUser.Update(new UpdateUser
-                        {
-                            Id = GetParaInt(p, "Id") ?? 0,
-                            FullName = GetPara(p, "FullName"),
-                            PhoneNumber = GetPara(p, "PhoneNumber"),
-                            Password = GetPara(p, "Password"),
-                            FirebaseToken = GetPara(p, "FirebaseToken"),
-                            LastLogin = GetParaDate(p, "LastLogin"),
-                            Admin = GetParaBool(p, "Admin") ?? false,
-                            DeletionDate = GetParaDate(p, "DeletionDate"),
-                            RemoveDeletionDate = GetParaBool(p, "RemoveDeletionDate") ?? false,
-                        });
-                        break;
-                    case "Delete":
-                        result = SpUser.Delete(new DeleteUser
-                        {
-                            Id = GetParaInt(p, "Id") ?? 0,
-                        });
-                        break;
-                    case "SoftDelete":
-                        result = SpUser.Update(new UpdateUser
-                        {
-                            Id = GetParaInt(p, "Id") ?? 0,
-                            DeletionDate = DateTime.Now,
-                        });
-                        break;
-                    case "Restore":
-                        result = SpUser.Update(new UpdateUser
-                        {
-                            Id = GetParaInt(p, "Id") ?? 0,
-                            RemoveDeletionDate = true,
-                        });
-                        break;
-                }
-                return result;
+                case "Login":
+                    result = Login(
+                        General.GetPara(p, "PhoneNo"),
+                        General.GetPara(p, "Password"),
+                        General.GetPara(p, "PhoneToken")
+                    );
+                    break;
+
+                case "Register":
+                    result = Register(
+                        General.GetPara(p, "FullName"),
+                        General.GetPara(p, "PhoneNumber"),
+                        General.GetPara(p, "Password"),
+                        General.GetPara(p, "PhoneToken")
+                    );
+                    break;
+
+                case "CheckPhone":
+                    result = CheckPhone(
+                        General.GetPara(p, "PhoneNumber")
+                    );
+                    break;
+
+                case "ResetPassword":
+                    result = ResetPassword(
+                        General.GetPara(p, "PhoneNumber"),
+                        General.GetPara(p, "Password")
+                    );
+                    break;
+                case "NewDevice":
+                    SpUser.Update(new UpdateUser
+                    {
+                        Id = General.GetParaInt(p, "ID")!.Value,
+                        PhoneToken = General.GetPara(p, "PhoneToken"),
+                    });
+                    result = new { Success = true, Message = "DEVICE_CHANGED" };
+                    break;
             }
+            return result;
+        }
+
+        // ── Login ────────────────────────────────────────────────────────────────────
+        [Obsolete]
+        private dynamic Login(string phoneNo, string password, string phoneToken)
+        {
+            dynamic userResult = SpUser.Get(new GetUser { PhoneNo = phoneNo });
+            if (userResult is string)
+                return new { Success = false, Message = "USER_NOT_FOUND" };
+
+            DataTable dt = (DataTable)userResult;
+            DataRow user = dt.Rows[0];
+
+            if (user["DeletionDate"] != DBNull.Value)
+                return new { Success = false, Message = "USER_DELETED" };
+
+            if (user["Password"].ToString() != password)
+                return new { Success = false, Message = "WRONG_PASSWORD" };
+
+            string dbPhoneToken = user["PhoneToken"]?.ToString() ?? "";
+            bool isNewDevice = !string.IsNullOrEmpty(dbPhoneToken)
+                                  && dbPhoneToken != phoneToken;
+
+
+            if (isNewDevice) {
+                return new { Success = false, Message = "DIFFERENT_DEVICE",ID = user["ID"] };
+            }
+
+                
+
+            // First login on this device — save phone token
+            if (string.IsNullOrEmpty(dbPhoneToken))
+                SpUser.Update(new UpdateUser
+                {
+                    Id = int.Parse(user["ID"].ToString()!),
+                    PhoneToken = phoneToken,
+                });
+
+            SpUser.Update(new UpdateUser
+            {
+                Id = int.Parse(user["ID"].ToString()!),
+                LastLogin = DateTime.Now,
+            });
+
+            return BuildTokenResponse(user, phoneToken,true);
+        }
+
+        // ── Register ─────────────────────────────────────────────────────────────────
+        [Obsolete]
+        private dynamic Register(string fullName, string phoneNumber, string password, string phoneToken)
+        {
+            string formatted = General.FormatLibyanPhone(phoneNumber);
+
+            // Check if phone already exists (including soft-deleted)
+            dynamic existing = SpUser.Get(new GetUser
+            {
+                PhoneNo = formatted,
+                WithDeletionDate = true,
+            });
+
+            int userId;
+
+            if (existing is DataTable dt && dt.Rows.Count > 0)
+            {
+                DataRow row = dt.Rows[0];
+
+                // Phone exists and is active — cannot register again
+                if (row["DeletionDate"] == DBNull.Value)
+                    return new { Success = false, Message = "PHONE_ALREADY_EXISTS" };
+
+                // Soft-deleted — restore the account
+                SpUser.Update(new UpdateUser
+                {
+                    Id = int.Parse(row["ID"].ToString()!),
+                    FullName = fullName,
+                    PhoneNumber = formatted,
+                    Password = password,
+                    PhoneToken = phoneToken,
+                    RemoveDeletionDate = true,
+                });
+                userId = int.Parse(row["ID"].ToString()!);
+            }
+            else
+            {
+                // Brand new user
+                userId = SpUser.Insert(new InsUser
+                {
+                    FullName = fullName,
+                    PhoneNumber = formatted,
+                    Password = password,
+                    PhoneToken = phoneToken,
+                });
+            }
+
+            // Get the fresh user row to build token
+            dynamic newUser = SpUser.Get(new GetUser { Id = userId });
+            DataRow user = ((DataTable)newUser).Rows[0];
+
+            return BuildTokenResponse(user, phoneToken,false);
+        }
+
+        // ── CheckPhone ───────────────────────────────────────────────────────────────
+        [Obsolete]
+        private dynamic CheckPhone(string phoneNumber)
+        {
+            string formatted = General.FormatLibyanPhone(phoneNumber);
+            dynamic result = SpUser.Get(new GetUser { PhoneNo = formatted });
+
+            if (result is string)
+                return new { Exists = false };
+
+            return new { Exists = true };
+        }
+
+        // ── ResetPassword ─────────────────────────────────────────────────────────────
+        [Obsolete]
+        private dynamic ResetPassword(string phoneNumber, string password)
+        {
+            string formatted = General.FormatLibyanPhone(phoneNumber);
+            dynamic userResult = SpUser.Get(new GetUser { PhoneNo = formatted });
+
+            if (userResult is string)
+                return new { Success = false, Message = "USER_NOT_FOUND" };
+
+            DataTable dt = (DataTable)userResult;
+            DataRow user = dt.Rows[0];
+
+            SpUser.Update(new UpdateUser
+            {
+                Id = int.Parse(user["ID"].ToString()!),
+                Password = password,
+            });
+
+            return new { Success = true, Message = "PASSWORD_RESET" };
+        }
+
+        // ── Shared: Build JWT response ────────────────────────────────────────────────
+        [Obsolete]
+        private dynamic BuildTokenResponse(DataRow user, string phoneToken,bool Login)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("ID",          user["ID"].ToString()!),
+                new Claim("PhoneNumber", user["PhoneNumber"].ToString()!),
+                new Claim("FullName",    user["FullName"].ToString()!),
+                new Claim("Admin",       user["Admin"].ToString()!),
+                new Claim("PhoneToken",  phoneToken),
+            };
+
+            JwtSecurityToken token = GetToken(claims);
+            string tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return new
+            {
+                Success = true,
+                Message = (Login)? "LOGIN_SUCCESS" : "REGISTER_SUCCESS",
+                Token = tokenString,
+                Expires = token.ValidTo,
+                Data = user
+            };
         }
 
         static readonly string ApiKey = "78512214deafed6a";
@@ -199,7 +311,7 @@ namespace Seiiarty.Services.Auth
             if (msgRes.MsgId != 1)
                 return msgRes;
 
-            DataTable tdSetupTable = DbService.GetSetupTable();
+            DataTable tdSetupTable = SpSetupTable.Get();
             if ((bool)tdSetupTable.DefaultView[0]["OtpDebugMode"] == true)
             {
                 DataRes xxx = new()
@@ -259,9 +371,9 @@ namespace Seiiarty.Services.Auth
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role,"+218910001122"),
             };
-            var token = GetToken(authClaims, forResetOrRegister:true);
+            var token = GetToken(authClaims);
 
-            DataTable tdSetupTable = DbService.GetSetupTable();
+            DataTable tdSetupTable = SpSetupTable.Get();
             if ((bool)tdSetupTable.DefaultView[0]["OtpDebugMode"] == true)
             {
                 return new
@@ -313,36 +425,20 @@ namespace Seiiarty.Services.Auth
 
 
         [Obsolete]
-        public JwtSecurityToken GetToken(List<Claim> authClaims, bool? forResetOrRegister = false,int? ExpiredTokenMinutes=0)
+        public JwtSecurityToken GetToken(List<Claim> authClaims)
         {
-            double expiredTokenMinutes = 0;
-            ExpiredTokenMinutes ??= 0;
-            if (ExpiredTokenMinutes != 0)
-                expiredTokenMinutes = int.Parse(ExpiredTokenMinutes.ToString()!);
-
-            bool forResetOrRegister1;
-            forResetOrRegister1 = forResetOrRegister ?? false;
-
-            double expirCount;
-            if (forResetOrRegister1)
-                expirCount = 2;
-            else
-            {
-                DataTable dtSetuTable = DbService.GetSetupTable();
-                expirCount = double.Parse(dtSetuTable.DefaultView[0]["TokenExpiredHours"].ToString()!);
-            }
+            
+            DataTable dtSetuTable = SpSetupTable.Get();
+            double expirCount = double.Parse(dtSetuTable.DefaultView[0]["TokenExpiredHours"].ToString()!);
+            
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]!));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-
-            DateTime xxx = (expiredTokenMinutes != 0) ? DateTime.Now.AddMinutes(expiredTokenMinutes) : forResetOrRegister1 ? DateTime.Now.AddMinutes(expirCount) : DateTime.Now.AddHours(expirCount);
-            xxx.ToLocalTime();
-
             var token = new JwtSecurityToken(
                 issuer: Configuration["JWT:ValidIssuer"],
                 audience: Configuration["JWT:ValidAudience"],
                 claims: authClaims,
-                expires: (expiredTokenMinutes != 0) ? DateTime.Now.AddMinutes(expiredTokenMinutes) : forResetOrRegister1 ? DateTime.Now.AddMinutes(expirCount) : DateTime.Now.AddHours(expirCount),
+                expires: DateTime.Now.AddHours(expirCount),
                 signingCredentials: signinCredentials
             );
 

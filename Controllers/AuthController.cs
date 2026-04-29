@@ -9,13 +9,6 @@ using static Seiiarty.Services.db.DbService;
 
 namespace Seiiarty.Controllers
 {
-    public class UserData
-    {
-        public required string PhoneNumber { get; set; }
-        public string? Password { get; set; } = "";
-        public string? PhoneToken { get; set; }
-    }
-
     public class UserToSendOTP
     {
         public required string PhoneNumber { get; set; }
@@ -44,13 +37,13 @@ namespace Seiiarty.Controllers
         public IConfiguration Configuration { get; } = config;
         private readonly IAuthService _authService = authService;
 
-        [HttpPost("User")]
+        [HttpPost("Auth")]
         
-        public IActionResult Login(RequestSp requestSp)
+        public IActionResult Auth(RequestSp requestSp)
         {
             try
             {
-                dynamic msgRes = _authService.Login(requestSp);
+                dynamic msgRes = _authService.Auth(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)

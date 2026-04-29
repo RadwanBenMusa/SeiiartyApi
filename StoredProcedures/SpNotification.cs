@@ -92,8 +92,8 @@ namespace Seiiarty.StoredProcedures
             if (upd.NotificationTypeId != null) setParts.Add($"NotificationTypeId = {upd.NotificationTypeId}");
             if (upd.UserId != null) setParts.Add($"UserId             = {upd.UserId}");
             if (upd.Title != null) setParts.Add($"Title              = '{upd.Title}'");
-            if (upd.Body != null) setParts.Add($"Body               = '{upd.Body}'");
-            if (upd.Data != null) setParts.Add($"Data               = '{upd.Data}'");
+            if (upd.Body != null) setParts.Add($"Body                = '{upd.Body}'");
+            if (upd.Data != null) setParts.Add($"Data                = '{upd.Data}'");
             if (upd.Readed != null) setParts.Add($"Readed             = {(upd.Readed.Value ? 1 : 0)}");
 
             if (setParts.Count == 0) return null;

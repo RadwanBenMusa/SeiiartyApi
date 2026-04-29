@@ -7,11 +7,10 @@ namespace Seiiarty.Services.Auth
 {
     public interface IAuthService
     {
-        public int Login(RequestSp requestSp);
+        public dynamic Auth(RequestSp requestSp);
         public bool CheckPhoneToken(int userId,string? PhoneToken); 
         public dynamic SendOTP(UserToSendOTP userToSendOTP);
         public dynamic VerifyOTP(UserToVerifyOTP userToVerifyOTP);
-        public dynamic GetSetupTable();
-        public JwtSecurityToken GetToken(List<Claim> authClaims, bool? forResetOrRegister = false ,int? ExpiredTokenMinutes=0);
+        public JwtSecurityToken GetToken(List<Claim> authClaims);
     }
 }

@@ -201,7 +201,7 @@ namespace Seiiarty.Services.Sp
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = SpSetupTable.Get(new GetSetupTable());
+                    result = SpSetupTable.Get();
                     break;
             }
             return result;
@@ -371,16 +371,8 @@ namespace Seiiarty.Services.Sp
                         Id = General.GetParaInt(p, "Id"),
                         PhoneNo = General.GetPara(p, "PhoneNo"),
                         ExcludeStoreId = General.GetParaInt(p, "ExcludeStoreId"),
+                        HasStore = General.GetParaBool(p, "HasStore") ?? false,
                         WithDeletionDate = General.GetParaBool(p, "WithDeletionDate") ?? false,
-                    });
-                    break;
-                case "Insert":
-                    result = SpUser.Insert(new InsUser
-                    {
-                        Name = General.GetPara(p, "Name") ?? "",
-                        PhoneNumber = General.GetPara(p, "PhoneNumber") ?? "",
-                        Password = General.GetPara(p, "Password") ?? "",
-                        FirebaseToken = General.GetPara(p, "FirebaseToken"),
                     });
                     break;
                 case "Update":
@@ -391,6 +383,7 @@ namespace Seiiarty.Services.Sp
                         PhoneNumber = General.GetPara(p, "PhoneNumber"),
                         Password = General.GetPara(p, "Password"),
                         FirebaseToken = General.GetPara(p, "FirebaseToken"),
+                        PhoneToken = General.GetPara(p, "PhoneToken"),
                         LastLogin = General.GetParaDate(p, "LastLogin"),
                         Admin = General.GetParaBool(p, "Admin") ?? false,
                         DeletionDate = General.GetParaDate(p, "DeletionDate"),

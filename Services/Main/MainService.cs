@@ -118,7 +118,7 @@ namespace Seiiarty.Services.Main
         [Obsolete]
         public async Task<dynamic> Notification(ApiNotification apiNotification)
         {
-            Message message;
+            //Message message;
             dynamic msgRes = new
             {
                 MsgId = 1,

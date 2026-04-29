@@ -93,7 +93,7 @@ namespace Seiiarty
             if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue!;
 
             string res =(string)dr[fieldName];
-            return res;
+            return res.Trim();
         }
         public static int GetValueInt(DataRow dr, string fieldName, int? defaultValue = 0)
         {
