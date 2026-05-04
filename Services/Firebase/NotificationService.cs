@@ -10,11 +10,12 @@ namespace SeiiartyApi.Services.Firebase
     public class NotificationService
     {
         [Obsolete]
-        public async Task<(bool Success, string Message)> SendAndSaveNotificationAsync(string? fcmToken, string title, string body, int notificationTypeId, int? userId = null, object? data = null)
+        public async Task<(bool Success, string Message)> SendAndSaveNotificationAsync( string title, string body, int notificationTypeId, int userId, object? data = null ,string ? fcmToken = null)
         {
             bool sent = false;
             Dictionary<string, string> firebaseData = MapToFirebaseData(data, notificationTypeId);
 
+    
             switch (notificationTypeId)
             {
                 case 1:
@@ -118,7 +119,7 @@ namespace SeiiartyApi.Services.Firebase
             }
         }
 
-        private Dictionary<string, string> MapToFirebaseData(object? data, int typeId)
+        public Dictionary<string, string> MapToFirebaseData(object? data, int typeId)
         {
             var dict = new Dictionary<string, string> { ["Type"] = typeId.ToString() };
             if (data != null)

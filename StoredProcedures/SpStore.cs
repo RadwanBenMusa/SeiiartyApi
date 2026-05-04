@@ -1,5 +1,4 @@
-﻿
-using System.Data;
+﻿using System.Data;
 using static Seiiarty.Services.db.DbService;
 
 namespace Seiiarty.StoredProcedures
@@ -67,7 +66,7 @@ namespace Seiiarty.StoredProcedures
             var conditions = new List<string>();
 
             if (get.Id != null) conditions.Add($"Store.ID            = {get.Id}");
-            if (get.Name != null) conditions.Add($"Store.Name          LIKE '%{get.Name}%'");
+            if (get.Name != null) conditions.Add($"Store.Name          LIKE N'%{get.Name}%'");
             if (get.StoreTypeId != null) conditions.Add($"Store.StoreTypeId   = {get.StoreTypeId}");
             if (get.UserRequestId != null) conditions.Add($"Store.UserRequestId = {get.UserRequestId}");
 
@@ -127,10 +126,10 @@ namespace Seiiarty.StoredProcedures
         {
             var setParts = new List<string>();
 
-            if (upd.Name != null) setParts.Add($"Name         = N'{upd.Name.Trim()}'");
-            if (upd.Descrip != null) setParts.Add($"Descrip      = N'{upd.Descrip.Trim()}'");
-            if (upd.Location != null) setParts.Add($"Location     = N'{upd.Location.Trim()}'");
-            if (upd.StoreTypeId != null) setParts.Add($"StoreTypeId  = {upd.StoreTypeId}");
+            if (upd.Name != null) setParts.Add($"Name        = N'{upd.Name.Trim()}'");
+            if (upd.Descrip != null) setParts.Add($"Descrip     = N'{upd.Descrip.Trim()}'");
+            if (upd.Location != null) setParts.Add($"Location    = N'{upd.Location.Trim()}'");
+            if (upd.StoreTypeId != null) setParts.Add($"StoreTypeId = {upd.StoreTypeId}");
 
             if (upd.ExpiredDate != null) setParts.Add($"ExpiredDate  = '{General.ToSqlDate(upd.ExpiredDate.Value)}'");
             if (upd.RemoveExpiredDate) setParts.Add("ExpiredDate  = NULL");
@@ -150,7 +149,6 @@ namespace Seiiarty.StoredProcedures
         public static dynamic Delete(DeleteStore q)
         {
             string cmd = $"DELETE FROM Store WHERE ID = {q.Id}";
-
             return ExecCommand(new RequestCmd { Cmd = cmd });
         }
 

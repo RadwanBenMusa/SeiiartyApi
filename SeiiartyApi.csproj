@@ -29,7 +29,6 @@
 		<Folder Include="Controllers\" />
 		<Folder Include="General\" />
 		<Folder Include="Services\" />
-		<Folder Include="StoredProcedures\" />
 		<Folder Include="clsMod\" />
 	</ItemGroup>
 

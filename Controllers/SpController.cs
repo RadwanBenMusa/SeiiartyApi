@@ -19,17 +19,17 @@ namespace Seiiarty.Controllers
         private readonly ISpService _spService = spService;
 
 #if DEBUG
-    [HttpPost("Category")]
+        [HttpPost("Category")]
 #else
     [HttpPost("Category"), Authorize]
 #endif
 
-        public IActionResult Category(RequestSp requestSp)
+        public async Task<IActionResult> Category(RequestSp requestSp)
         {
             try
             {
 
-                dynamic msgRes = _spService.DoSpCategory(requestSp);
+                dynamic msgRes = await _spService.DoSpCategory(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -43,13 +43,13 @@ namespace Seiiarty.Controllers
 #else
         [HttpPost("Item"), Authorize]
 #endif
-        
-        public IActionResult Item(RequestSp requestSp)
+
+        public async Task<IActionResult> Item(RequestSp requestSp)
         {
             try
             {
 
-                dynamic msgRes = _spService.DoSpItem(requestSp);
+                dynamic msgRes = await _spService.DoSpItem(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -63,12 +63,12 @@ namespace Seiiarty.Controllers
 #else
         [HttpPost("Notification"), Authorize]
 #endif
-        
-        public IActionResult Notification(RequestSp requestSp)
+
+        public async Task<IActionResult> Notification(RequestSp requestSp)
         {
             try
             {
-                dynamic msgRes = _spService.DoSpNotification(requestSp);
+                dynamic msgRes = await _spService.DoSpNotification(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception ex)
@@ -77,13 +77,53 @@ namespace Seiiarty.Controllers
             }
         }
 
+
+
+#if DEBUG
+        [HttpPost("Order")]
+#else
+        [HttpPost("Order"), Authorize]
+#endif
+
+        public async Task<IActionResult> Order(RequestSp requestSp)
+        {
+            try
+            {
+                dynamic msgRes = await _spService.DoSpOrder(requestSp);
+                return StatusCode(StatusCodes.Status200OK, msgRes);
+            }
+            catch (Exception ex)
+            {
+                return Error(ex);
+            }
+        }
+
+#if DEBUG
+        [HttpPost("OrderDet")]
+#else
+        [HttpPost("OrderDet"), Authorize]
+#endif
+        public async Task<IActionResult> OrderDet(RequestSp requestSp)
+        {
+            try
+            {
+                dynamic msgRes = await _spService.DoSpOrderDet(requestSp);
+                return StatusCode(StatusCodes.Status200OK, msgRes);
+            }
+            catch (Exception ex)
+            {
+                return Error(ex);
+            }
+        }
+
+
         [HttpPost("SetupTable")]
-        public IActionResult SetupTable(RequestSp requestSp)
+        public async Task<IActionResult> SetupTable(RequestSp requestSp)
         {
             try
             {
 
-                dynamic msgRes = _spService.DoSpSetupTable(requestSp);
+                dynamic msgRes = await _spService.DoSpSetupTable(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -97,13 +137,13 @@ namespace Seiiarty.Controllers
 #else
         [HttpPost("Store"), Authorize]
 #endif
-        
-        public IActionResult Store(RequestSp requestSp)
+
+        public async Task<IActionResult> Store(RequestSp requestSp)
         {
             try
             {
 
-                dynamic msgRes = _spService.DoSpStore(requestSp);
+                dynamic msgRes = await _spService.DoSpStore(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -117,13 +157,13 @@ namespace Seiiarty.Controllers
 #else
         [HttpPost("StoreType"), Authorize]
 #endif
-        
-        public IActionResult StoreType(RequestSp requestSp)
+
+        public async Task<IActionResult> StoreType(RequestSp requestSp)
         {
             try
             {
 
-                dynamic msgRes = _spService.DoSpStoreType(requestSp);
+                dynamic msgRes = await _spService.DoSpStoreType(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -138,12 +178,12 @@ namespace Seiiarty.Controllers
         [HttpPost("StoreUser"), Authorize]
 #endif
 
-        public IActionResult StoreUser(RequestSp requestSp)
+        public async Task<IActionResult> StoreUser(RequestSp requestSp)
         {
             try
             {
 
-                dynamic msgRes = _spService.DoSpStoreUser(requestSp);
+                dynamic msgRes = await _spService.DoSpStoreUser(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)
@@ -158,12 +198,12 @@ namespace Seiiarty.Controllers
         [HttpPost("User"), Authorize]
 #endif
 
-        public IActionResult User(RequestSp requestSp)
+        public async Task<IActionResult> User(RequestSp requestSp)
         {
             try
             {
 
-                dynamic msgRes = _spService.DoSpUser(requestSp);
+                dynamic msgRes = await _spService.DoSpUser(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }
             catch (Exception Ex)

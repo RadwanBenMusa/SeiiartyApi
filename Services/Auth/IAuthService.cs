@@ -9,8 +9,6 @@ namespace Seiiarty.Services.Auth
     {
         public dynamic Auth(RequestSp requestSp);
         public bool CheckPhoneToken(int userId,string? PhoneToken); 
-        public dynamic SendOTP(UserToSendOTP userToSendOTP);
-        public dynamic VerifyOTP(UserToVerifyOTP userToVerifyOTP);
         public JwtSecurityToken GetToken(List<Claim> authClaims);
     }
 }
