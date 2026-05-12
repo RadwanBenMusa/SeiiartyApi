@@ -28,7 +28,7 @@ namespace Seiiarty.Services.Auth
 
             if (dtUser.Rows.Count > 0)
             {
-                string dbPhoneToken = General.GetValueString(dtUser.Rows[0], "phoneToken");
+                string dbPhoneToken = General.GetValue<string>(dtUser.Rows[0], "phoneToken");
                 if (string.IsNullOrEmpty(dbPhoneToken))
                 {
                     string cmd = $"Update [User] Set phoneToken='{PhoneToken}' Where ID={userId}";

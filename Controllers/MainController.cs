@@ -58,25 +58,6 @@ namespace Seiiarty.Controllers
                 return Error(Ex);
             }
         }
-
-
-        [HttpPost("Notification")]
-        
-        public async Task<IActionResult> Notification(ApiNotification apiNotification)
-        {
-            try
-            {
-                
-                dynamic msgRes = await _mainService.Notification(apiNotification);
-                //_logger.LogInformation($"Notification ===> msgRes = {JsonConvert.SerializeObject(msgRes)}");
-                return StatusCode(StatusCodes.Status200OK, msgRes);
-            }
-            catch (Exception Ex)
-            {
-                
-                return Error(Ex);
-            }
-        }
        
         [HttpPost("TestAuth"),Authorize]
         public IActionResult TestAuth()

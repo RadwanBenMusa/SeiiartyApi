@@ -17,11 +17,29 @@ namespace Seiiarty.Controllers
         public IConfiguration Configuration { get; } = config;
 
         private readonly ISpService _spService = spService;
+#if DEBUG
+        [HttpPost("Basket")]
+#else
+        [HttpPost("Basket"), Authorize]
+#endif
+
+        public IActionResult Basket(RequestSp requestSp)
+        {
+            try
+            {
+                dynamic msgRes = _spService.DoSpBasket(requestSp);
+                return StatusCode(StatusCodes.Status200OK, msgRes);
+            }
+            catch (Exception ex)
+            {
+                return Error(ex);
+            }
+        }
 
 #if DEBUG
         [HttpPost("Category")]
 #else
-    [HttpPost("Category"), Authorize]
+        [HttpPost("Category"), Authorize]
 #endif
 
         public async Task<IActionResult> Category(RequestSp requestSp)
@@ -77,18 +95,16 @@ namespace Seiiarty.Controllers
             }
         }
 
-
-
 #if DEBUG
         [HttpPost("Order")]
 #else
-        [HttpPost("Order"), Authorize]
-#endif
-
+        [HttpPost("Notification"), Authorize]
+#endif       
         public async Task<IActionResult> Order(RequestSp requestSp)
         {
             try
             {
+                // Await the asynchronous service call
                 dynamic msgRes = await _spService.DoSpOrder(requestSp);
                 return StatusCode(StatusCodes.Status200OK, msgRes);
             }

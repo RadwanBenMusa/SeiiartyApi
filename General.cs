@@ -119,73 +119,28 @@ namespace Seiiarty
         // └─────────────────────────────────────────────────────────────────────┘
 
         /// <summary>
-        /// Returns a <see cref="bool"/> from a DataRow field.
+        /// Returns a <see cref="any type"/> from a DataRow field.
         /// Returns <paramref name="defaultValue"/> if the field is null or DBNull.
         /// </summary>
-        public static bool GetValueBool(DataRow dr, string fieldName, bool defaultValue = false)
+        public static T GetValue<T>(DataRow row, string columnName, T defaultValue = default)
         {
-            if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue;
-            return (bool)dr[fieldName];
-        }
+            if (row == null || !row.Table.Columns.Contains(columnName))
+                return defaultValue;
 
-        /// <summary>
-        /// Returns 1 if the DataRow boolean field is true, 0 if false.
-        /// Returns 0 (or 1 if defaultValue is true) when the field is null or DBNull.
-        /// </summary>
-        public static int GetValueBoolZeroOne(DataRow dr, string fieldName, bool defaultValue = false)
-        {
-            if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue ? 1 : 0;
-            return ((bool)dr[fieldName]) ? 1 : 0;
-        }
+            object value = row[columnName];
 
-        /// <summary>
-        /// Returns a <see cref="decimal"/> from a DataRow field.
-        /// Returns <paramref name="defaultValue"/> if the field is null or DBNull.
-        /// </summary>
-        public static decimal GetValueDecimal(DataRow dr, string fieldName, decimal defaultValue = 0)
-        {
-            if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue;
-            return (decimal)dr[fieldName];
-        }
+            if (value == null || value == DBNull.Value)
+                return defaultValue;
 
-        /// <summary>
-        /// Returns a trimmed <see cref="string"/> from a DataRow field.
-        /// Returns <paramref name="defaultValue"/> if the field is null or DBNull.
-        /// </summary>
-        public static string GetValueString(DataRow dr, string fieldName, string defaultValue = "")
-        {
-            if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue;
-            return dr[fieldName].ToString()!.Trim();
-        }
-
-        /// <summary>
-        /// Returns an <see cref="int"/> from a DataRow field.
-        /// Returns <paramref name="defaultValue"/> if the field is null or DBNull.
-        /// </summary>
-        public static int GetValueInt(DataRow dr, string fieldName, int defaultValue = 0)
-        {
-            if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue;
-            return (int)dr[fieldName];
-        }
-
-        /// <summary>
-        /// Returns a <see cref="DateTime"/> from a DataRow field.
-        /// Returns <c>null</c> if the field is null or DBNull.
-        /// </summary>
-        public static DateTime? GetValueDate(DataRow dr, string fieldName)
-        {
-            if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return null;
-            return (DateTime)dr[fieldName];
-        }
-
-        /// <summary>
-        /// Returns a <see cref="long"/> from a DataRow field.
-        /// Returns <paramref name="defaultValue"/> if the field is null or DBNull.
-        /// </summary>
-        public static long GetValueLong(DataRow dr, string fieldName, long defaultValue = 0)
-        {
-            if (dr[fieldName] == null || dr[fieldName] == DBNull.Value) return defaultValue;
-            return Convert.ToInt64(dr[fieldName]);
+            try
+            {
+                // Handles cases where the type might be slightly different (e.g., long vs int)
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+            catch
+            {
+                return defaultValue;
+            }
         }
 
         // ┌─────────────────────────────────────────────────────────────────────┐

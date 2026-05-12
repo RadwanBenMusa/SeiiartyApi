@@ -76,7 +76,7 @@ namespace Seiiarty.StoredProcedures
             }
             if (get.HasStore == true)
             {
-                conditions.Add($"EXISTS (SELECT 1 FROM StoreUser WHERE StoreUser.UserId = [User].ID AND StoreUser.DeletionDate IS NULL)");
+                conditions.Add($"EXISTS (SELECT 1 FROM StoreUser INNER JOIN Store ON StoreUser.StoreId = Store.ID WHERE StoreUser.UserId = [User].ID AND StoreUser.DeletionDate IS NULL AND Store.DeletionDate IS NULL AND (Store.ExpiredDate IS NULL OR Store.ExpiredDate > GETDATE()))");
             }
             if (get.ExcludeStoreId != null)
             {

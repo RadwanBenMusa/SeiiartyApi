@@ -151,7 +151,7 @@ namespace SeiiartyApi.Services.Firebase
             {
                 for (int i = 0; i < users.Rows.Count; i++)
                 {
-                    string token = General.GetValueString(users.Rows[i], "FirebaseToken");
+                    string token = General.GetValue<string>(users.Rows[i], "FirebaseToken");
                     token = token?.Trim();
                     if (!string.IsNullOrEmpty(token) && token.Length > 60)
                     {

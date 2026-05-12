@@ -8,21 +8,68 @@ namespace Seiiarty.Services.Sp
     public class SpService() : ISpService
     {
         [Obsolete]
-        public async Task<dynamic> DoSpCategory(RequestSp requestSp)
+        public dynamic DoSpBasket(RequestSp requestSp)
+        {
+            dynamic result = "";
+            var p = requestSp.Paras ?? [];
+
+            switch (requestSp.Method)
+            {
+                // ── Get baskets (by Id or UserId)
+                case "Get":
+                    result = SpBasket.Get(new GetBasket
+                    {
+                        Id = General.GetParaInt(p, "Id"),
+                        UserId = General.GetParaInt(p, "UserId"),
+                        WithDeleted = General.GetParaBool(p, "WithDeleted") ?? false,
+                    });
+                    break;
+
+                // ── Create a new basket for a user — returns the new basket ID
+                case "Insert":
+                    result = SpBasket.Insert(new InsBasket
+                    {
+                        UserId = General.GetParaInt(p, "UserId") ?? 0,
+                    });
+                    break;
+
+                // ── Soft delete or restore a basket
+                case "SoftDelete":
+                    result = SpBasket.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
+                    break;
+
+                case "Restore":
+                    result = SpBasket.Restore(General.GetParaInt(p, "Id") ?? 0);
+                    break;
+
+                // ── Hard delete
+                case "Delete":
+                    result = SpBasket.Delete(new DeleteBasket
+                    {
+                        Id = General.GetParaInt(p, "Id") ?? 0,
+                    });
+                    break;
+            }
+
+            return result;
+        }
+
+        [Obsolete]
+        public dynamic DoSpCategory(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpCategory.Get(new GetCategory
+                    result = SpCategory.Get(new GetCategory
                     {
                         Id = General.GetParaInt(p, "Id"),
                         CatTypeId = General.GetParaInt(p, "CatTypeId"),
                     });
                     break;
                 case "Insert":
-                    result = await SpCategory.Insert(new InsCategory
+                    result = SpCategory.Insert(new InsCategory
                     {
                         CatNo = General.GetParaInt(p, "CatNo") ?? 0,
                         Descrip = General.GetPara(p, "Descrip") ?? "",
@@ -30,7 +77,7 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Update":
-                    result = await SpCategory.Update(new UpdateCategory
+                    result = SpCategory.Update(new UpdateCategory
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         CatNo = General.GetParaInt(p, "CatNo"),
@@ -42,36 +89,36 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Delete":
-                    result = await SpCategory.Delete(new DeleteCategory
+                    result = SpCategory.Delete(new DeleteCategory
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
                 case "SoftDelete":
-                    result = await SpCategory.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Restore":
-                    result = await SpCategory.Restore(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Freeze":
-                    result = await SpCategory.Freeze(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.Freeze(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Unfreeze":
-                    result = await SpCategory.Unfreeze(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpCategory.Unfreeze(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpItem(RequestSp requestSp)
+        public dynamic DoSpItem(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpItem.Get(new GetItem
+                    result = SpItem.Get(new GetItem
                     {
                         Id = General.GetParaInt(p, "Id"),
                         CategoryId = General.GetParaInt(p, "CategoryId"),
@@ -93,7 +140,7 @@ namespace Seiiarty.Services.Sp
                     );
                     break;
                 case "Insert":
-                    result = await SpItem.Insert(new InsItem
+                    result = SpItem.Insert(new InsItem
                     {
                         ItemNo = General.GetParaInt(p, "ItemNo") ?? 0,
                         Name = General.GetPara(p, "Name") ?? "",
@@ -103,7 +150,7 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Update":
-                    result = await SpItem.Update(new UpdateItem
+                    result = SpItem.Update(new UpdateItem
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         ItemNo = General.GetParaInt(p, "ItemNo"),
@@ -135,11 +182,11 @@ namespace Seiiarty.Services.Sp
                     result = SpItem.Unfreeze(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpNotification(RequestSp requestSp)
+        public dynamic DoSpNotification(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
@@ -147,7 +194,7 @@ namespace Seiiarty.Services.Sp
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpNotification.Get(new GetNotification
+                    result = SpNotification.Get(new GetNotification
                     {
                         Id = General.GetParaInt(p, "Id"),
                         NotificationTypeId = General.GetParaInt(p, "NotificationTypeId"),
@@ -156,7 +203,7 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Insert":
-                    result = await SpNotification.Insert(new InsNotification
+                    result = SpNotification.Insert(new InsNotification
                     {
                         NotificationTypeId = General.GetPara(p, "NotificationTypeId") ?? 0,
                         UserId = General.GetParaInt(p, "UserId"),
@@ -166,7 +213,7 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Update":
-                    result = await SpNotification.Update(new UpdateNotification
+                    result = SpNotification.Update(new UpdateNotification
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         NotificationTypeId = General.GetParaInt(p, "NotificationTypeId"),
@@ -178,14 +225,14 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "MarkAsRead":
-                    result = await SpNotification.Update(new UpdateNotification
+                    result = SpNotification.Update(new UpdateNotification
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         Readed = true,
                     });
                     break;
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
@@ -196,18 +243,27 @@ namespace Seiiarty.Services.Sp
 
             switch (requestSp.Method)
             {
-                case "OSR": // One Shot Request: create order + order detail + send notification in one call
-                    // 1. Insert the order (sync, returns int)
+                case "Get":
+                    result = SpOrder.Get(new GetOrder
+                    {
+                        Id = General.GetParaInt(p, "Id"),
+                        CreationUserId = General.GetParaInt(p, "CreationUserId"),
+                        Status = (OrderStatus?)General.GetParaInt(p, "StatusId"),
+                        WithDeleted = General.GetParaBool(p, "WithDeleted") ?? false,
+                        FromDate = General.GetParaDate(p, "FromDate"),
+                        ToDate = General.GetParaDate(p, "ToDate")
+                    });
+                    break;
+
+                case "OSR": // One Shot Request
                     var orderResult = SpOrder.Insert(new InsOrder
                     {
                         CreationUserId = General.GetParaInt(p, "CreationUserId") ?? 0,
                         StatusId = General.GetParaInt(p, "StatusId") ?? (int)OrderStatus.Pending,
                     });
 
-                    // 2. Parse the OrderId
                     int orderId = Convert.ToInt32(orderResult);
 
-                    // 3. Insert the order detail (sync, returns int)
                     result = SpOrderDet.Insert(new InsOrderDet
                     {
                         ItemId = General.GetParaInt(p, "ItemId") ?? 0,
@@ -215,8 +271,8 @@ namespace Seiiarty.Services.Sp
                         Quantity = General.GetParaInt(p, "Quantity") ?? 0,
                     });
 
-                    // 4. Send notification (async)
                     NotificationService notificationService = new NotificationService();
+                    // Awaiting here prevents the 'int' does not contain a definition for 'GetAwaiter' error
                     await notificationService.SendAndSaveNotificationAsync(
                         title: General.GetPara(p, "Title") ?? "",
                         body: General.GetPara(p, "Body") ?? "",
@@ -234,7 +290,7 @@ namespace Seiiarty.Services.Sp
                     break;
 
                 case "Update":
-                    result = await SpOrder.Update(new UpdateOrder
+                    result = SpOrder.Update(new UpdateOrder
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         StatusId = General.GetParaInt(p, "StatusId"),
@@ -244,34 +300,34 @@ namespace Seiiarty.Services.Sp
                     break;
 
                 case "Delete":
-                    result = await SpOrder.Delete(new DeleteOrder
+                    result = SpOrder.Delete(new DeleteOrder
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
 
                 case "Confirm":
-                    result = await SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Confirmed);
+                    result = SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Confirmed);
                     break;
 
                 case "MarkReady":
-                    result = await SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Ready);
+                    result = SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Ready);
                     break;
 
                 case "MarkDelivered":
-                    result = await SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Delivered);
+                    result = SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Delivered);
                     break;
 
                 case "Cancel":
-                    result = await SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Cancelled);
+                    result = SpOrder.ChangeStatus(General.GetParaInt(p, "Id") ?? 0, OrderStatus.Cancelled);
                     break;
 
                 case "SoftDelete":
-                    result = await SpOrder.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpOrder.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
 
                 case "Restore":
-                    result = await SpOrder.Restore(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpOrder.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
 
@@ -279,7 +335,7 @@ namespace Seiiarty.Services.Sp
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpOrderDet(RequestSp requestSp)
+        public dynamic DoSpOrderDet(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
@@ -287,11 +343,12 @@ namespace Seiiarty.Services.Sp
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpOrderDet.Get(new GetOrderDet
+                    result = SpOrderDet.Get(new GetOrderDet
                     {
                         Id = General.GetParaInt(p, "Id"),
                         ItemId = General.GetParaInt(p, "ItemId"),
                         OrderId = General.GetParaInt(p, "OrderId"),
+                        BasketId = General.GetParaInt(p, "BasketId"),
                     });
                     break;
 
@@ -301,11 +358,12 @@ namespace Seiiarty.Services.Sp
                         ItemId = General.GetParaInt(p, "ItemId") ?? 0,
                         OrderId = General.GetParaInt(p, "OrderId") ?? 0,
                         Quantity = General.GetParaInt(p, "Quantity") ?? 0,
+                        BasketId = General.GetParaInt(p, "BasketId")?? 0,
                     });
                     break;
 
                 case "Update":
-                    result = await SpOrderDet.Update(new UpdateOrderDet
+                    result = SpOrderDet.Update(new UpdateOrderDet
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         ItemId = General.GetParaInt(p, "ItemId"),
@@ -314,31 +372,31 @@ namespace Seiiarty.Services.Sp
                     break;
 
                 case "Delete":
-                    result = await SpOrderDet.Delete(new DeleteOrderDet
+                    result = SpOrderDet.Delete(new DeleteOrderDet
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
             }
 
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpSetupTable(RequestSp requestSp)
+        public dynamic DoSpSetupTable(RequestSp requestSp)
         {
             dynamic result = "";
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpSetupTable.Get();
+                    result = SpSetupTable.Get();
                     break;
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpStore(RequestSp requestSp)
+        public dynamic DoSpStore(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
@@ -351,7 +409,7 @@ namespace Seiiarty.Services.Sp
                     if (statusStr != null && Enum.TryParse<StoreStatus>(statusStr, ignoreCase: true, out var parsedStatus))
                         status = parsedStatus;
 
-                    result = await SpStore.Get(new GetStore
+                    result = SpStore.Get(new GetStore
                     {
                         Id = General.GetParaInt(p, "Id"),
                         Name = General.GetPara(p, "Name"),
@@ -362,7 +420,7 @@ namespace Seiiarty.Services.Sp
                     break;
 
                 case "Insert":
-                    result = await SpStore.Insert(new InsStore
+                    result = SpStore.Insert(new InsStore
                     {
                         Name = General.GetPara(p, "Name") ?? "",
                         Descrip = General.GetPara(p, "Descrip") ?? "",
@@ -376,7 +434,7 @@ namespace Seiiarty.Services.Sp
                     bool removeExpired = General.GetParaBool(p, "RemoveExpiredDate") ?? false;
                     bool removeDeleted = General.GetParaBool(p, "RemoveDeletionDate") ?? false;
 
-                    result = await SpStore.Update(new UpdateStore
+                    result = SpStore.Update(new UpdateStore
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         Name = General.GetPara(p, "Name"),
@@ -391,77 +449,77 @@ namespace Seiiarty.Services.Sp
                     break;
 
                 case "Delete":
-                    result = await SpStore.Delete(new DeleteStore
+                    result = SpStore.Delete(new DeleteStore
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
 
                 case "Approve":
-                    result = await SpStore.Approve(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.Approve(General.GetParaInt(p, "Id") ?? 0);
                     break;
 
                 case "RevokeApproval":
-                    result = await SpStore.RevokeApproval(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.RevokeApproval(General.GetParaInt(p, "Id") ?? 0);
                     break;
 
                 case "SoftDelete":
-                    result = await SpStore.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
 
                 case "Restore":
-                    result = await SpStore.Restore(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpStore.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
 
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpStoreType(RequestSp requestSp)
+        public dynamic DoSpStoreType(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpStoreType.Get(new GetStoreType
+                    result = SpStoreType.Get(new GetStoreType
                     {
                         Id = General.GetParaInt(p, "Id"),
                     });
                     break;
                 case "Insert":
-                    result = await SpStoreType.Insert(new InsStoreType
+                    result = SpStoreType.Insert(new InsStoreType
                     {
                         Descrip = General.GetPara(p, "Descrip") ?? "",
                     });
                     break;
                 case "Update":
-                    result = await SpStoreType.Update(new UpdateStoreType
+                    result = SpStoreType.Update(new UpdateStoreType
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         Descrip = General.GetPara(p, "Descrip"),
                     });
                     break;
                 case "Delete":
-                    result = await SpStoreType.Delete(new DeleteStoreType
+                    result = SpStoreType.Delete(new DeleteStoreType
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpStoreUser(RequestSp requestSp)
+        public dynamic DoSpStoreUser(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpStoreUser.Get(new GetStoreUser
+                    result = SpStoreUser.Get(new GetStoreUser
                     {
                         Id = General.GetParaInt(p, "Id"),
                         StoreId = General.GetParaInt(p, "StoreId"),
@@ -470,14 +528,14 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Insert":
-                    result = await SpStoreUser.Insert(new InsStoreUser
+                    result = SpStoreUser.Insert(new InsStoreUser
                     {
                         StoreId = General.GetParaInt(p, "StoreId") ?? 0,
                         UserId = General.GetParaInt(p, "UserId") ?? 0,
                     });
                     break;
                 case "Update":
-                    result = await SpStoreUser.Update(new UpdateStoreUser
+                    result = SpStoreUser.Update(new UpdateStoreUser
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         DeletionDate = General.GetParaDate(p, "DeletionDate"),
@@ -485,30 +543,30 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Delete":
-                    result = await SpStoreUser.Delete(new DeleteStoreUser
+                    result = SpStoreUser.Delete(new DeleteStoreUser
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                     });
                     break;
                 case "SoftDelete":
-                    result = await SpStoreUser.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpStoreUser.SoftDelete(General.GetParaInt(p, "Id") ?? 0);
                     break;
                 case "Restore":
-                    result = await SpStoreUser.Restore(General.GetParaInt(p, "Id") ?? 0);
+                    result = SpStoreUser.Restore(General.GetParaInt(p, "Id") ?? 0);
                     break;
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         [Obsolete]
-        public async Task<dynamic> DoSpUser(RequestSp requestSp)
+        public dynamic DoSpUser(RequestSp requestSp)
         {
             dynamic result = "";
             var p = requestSp.Paras ?? [];
             switch (requestSp.Method)
             {
                 case "Get":
-                    result = await SpUser.Get(new GetUser
+                    result = SpUser.Get(new GetUser
                     {
                         Id = General.GetParaInt(p, "Id"),
                         PhoneNo = General.GetPara(p, "PhoneNo"),
@@ -518,7 +576,7 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Update":
-                    result = await SpUser.Update(new UpdateUser
+                    result = SpUser.Update(new UpdateUser
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         FullName = General.GetPara(p, "FullName"),
@@ -533,7 +591,7 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Delete":
-                    result = await SpUser.Delete(new DeleteUser
+                    result = SpUser.Delete(new DeleteUser
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                     });
@@ -546,14 +604,14 @@ namespace Seiiarty.Services.Sp
                     });
                     break;
                 case "Restore":
-                    result = await SpUser.Update(new UpdateUser
+                    result = SpUser.Update(new UpdateUser
                     {
                         Id = General.GetParaInt(p, "Id") ?? 0,
                         RemoveDeletionDate = true,
                     });
                     break;
             }
-            return result;
+            return Task.FromResult(result);
         }
     }
 }

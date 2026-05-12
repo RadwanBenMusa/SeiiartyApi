@@ -58,14 +58,17 @@ namespace Seiiarty.StoredProcedures
     {
         public int? Id { get; set; }
         public int? ItemId { get; set; }
-        public int? OrderId { get;set; }  
-    }
+        public int? OrderId { get; set; }
+        public int? BasketId { get; set; }
+    }   
 
     public class InsOrderDet
     {
-        public required int ItemId { get; set; }
-        public required int OrderId { get; set; }
-        public required int Quantity { get; set; }
+        public  int? ItemId { get; set; }
+        public  int? OrderId { get; set; }
+        public  int? Quantity { get; set; }
+        public int? BasketId { get; set; }
+
     }
 
     public class UpdateOrderDet

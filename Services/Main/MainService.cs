@@ -95,14 +95,14 @@ namespace Seiiarty.Services.Main
             DataTable adminsTokens = GetNamaAdminsTokens();
             foreach (DataRow row in adminsTokens.Rows)
             {
-                apiNotification.Token = GetValueString(row, "FirebaseToken");
+                apiNotification.Token = GetValue<string>(row, "FirebaseToken") ?? "";
                 message = new Message()
                 {
                     Notification = apiNotification.Notification,
                     Data = apiNotification.Data,
                     Token = apiNotification.Token
                 };
-                msgRes = await SendNotification(message, 1, GetValueInt(row, "ID"));
+                msgRes = await SendNotification(message, 1, GetValue<int>(row, "ID"));
             }
         }
         [Obsolete]

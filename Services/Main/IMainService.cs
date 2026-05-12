@@ -9,7 +9,6 @@ namespace Seiiarty.Services.Main
     {
         public dynamic ExecCmd(RequestCmd requestCmd);
         public dynamic DoSomeThings(Request request);
-        public Task<dynamic> Notification(ApiNotification apiNotification);
 
     }
 }
