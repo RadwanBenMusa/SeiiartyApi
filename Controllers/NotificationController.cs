@@ -14,19 +14,25 @@ public class NotificationController : ControllerBase
         _notificationService = notificationService;
     }
 
-    [HttpPost("Send"),Obsolete]
-    
+    // ── Send ──────────────────────────────────────────────────────────────────
+    // The app sends: Title, Message, NotificationTypeId, UserId, Data (optional)
+    // The API reads FCM tokens from the DB and sends via Firebase Admin SDK.
+    // The app never knows about FCM tokens.
+    [HttpPost("Send"), Authorize]
+    [Obsolete]
     public async Task<IActionResult> SendNotification([FromBody] NotificationRequest request)
     {
         var (success, message) = await _notificationService.SendAndSaveNotificationAsync(
-            fcmToken: request.Token,
             title: request.Title,
             body: request.Message,
             notificationTypeId: request.NotificationTypeId,
             userId: request.UserId,
-            data: request.Data 
+            data: request.Data
+        // fcmToken is NOT passed — API fetches the right tokens from DB
         );
 
-        return success ? Ok(new { success, message }) : BadRequest(new { success, message });
+        return success
+            ? Ok(new { success, message })
+            : BadRequest(new { success, message });
     }
 }

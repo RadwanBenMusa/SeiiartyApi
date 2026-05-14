@@ -1,5 +1,4 @@
-﻿
-using System.Data;
+﻿using System.Data;
 using Seiiarty;
 using static Seiiarty.Services.db.DbService;
 
@@ -34,7 +33,10 @@ namespace Seiiarty.StoredProcedures
         public string? FirebaseToken { get; set; }
         public string? PhoneToken { get; set; }
         public DateTime? LastLogin { get; set; }
-        public bool Admin { get; set; } = false;
+        // ── FIX: nullable so callers that don't pass Admin leave the column untouched.
+        // Previously bool (default false) meant Update() always skipped the column
+        // and could never set Admin = 0 intentionally.
+        public bool? Admin { get; set; }
         public DateTime? DeletionDate { get; set; }
         public bool RemoveDeletionDate { get; set; } = false;
     }
@@ -55,12 +57,12 @@ namespace Seiiarty.StoredProcedures
             var conditions = new List<string>();
 
             if (!get.WithDeletionDate)
-            { 
+            {
                 conditions.Add("[User].DeletionDate IS NULL");
             }
 
             if (get.Id != null)
-            { 
+            {
                 conditions.Add($"[User].ID = {get.Id}");
             }
 
@@ -71,7 +73,7 @@ namespace Seiiarty.StoredProcedures
             }
 
             if (get.Admin != null)
-            { 
+            {
                 conditions.Add($"[User].Admin = {(get.Admin.Value ? 1 : 0)}");
             }
             if (get.HasStore == true)
@@ -94,6 +96,7 @@ namespace Seiiarty.StoredProcedures
             if (result.Rows.Count == 0) return "No users found";
             return result;
         }
+
         // ── INSERT ────────────────────────────────────────────────
         [Obsolete]
         public static dynamic Insert(InsUser ins)
@@ -115,24 +118,23 @@ namespace Seiiarty.StoredProcedures
         {
             var setParts = new List<string>();
 
-            if (upd.PhoneNumber != null  ) setParts.Add($"PhoneNumber   = '{upd.PhoneNumber}'");
-            if (upd.FullName != null     ) setParts.Add($"FullName      = '{upd.FullName.Trim()}'");
-            if (upd.Password != null     ) setParts.Add($"Password      = '{upd.Password}'");
+            if (upd.PhoneNumber != null) setParts.Add($"PhoneNumber   = '{upd.PhoneNumber}'");
+            if (upd.FullName != null) setParts.Add($"FullName      = '{upd.FullName.Trim()}'");
+            if (upd.Password != null) setParts.Add($"Password      = '{upd.Password}'");
             if (upd.FirebaseToken != null) setParts.Add($"FirebaseToken = '{upd.FirebaseToken}'");
-            if (upd.PhoneToken != null   ) setParts.Add($"PhoneToken    = '{upd.PhoneToken}'");
-            if (upd.LastLogin != null    ) setParts.Add($"LastLogin     = '{General.ToSqlDate(upd.LastLogin.Value)}'");
-            if (upd.Admin                ) setParts.Add($"Admin         = 1");
-            if (upd.DeletionDate != null ) setParts.Add($"DeletionDate  = '{General.ToSqlDate(upd.DeletionDate.Value)}'");
-            if (upd.RemoveDeletionDate   ) setParts.Add("DeletionDate  = NULL");
+            if (upd.PhoneToken != null) setParts.Add($"PhoneToken    = '{upd.PhoneToken}'");
+            if (upd.LastLogin != null) setParts.Add($"LastLogin     = '{General.ToSqlDate(upd.LastLogin.Value)}'");
+            // ── FIX: only touch the Admin column when the caller explicitly passes a value.
+            // HasValue = true means the caller sent true or false on purpose.
+            if (upd.Admin.HasValue) setParts.Add($"Admin         = {(upd.Admin.Value ? 1 : 0)}");
+            if (upd.DeletionDate != null) setParts.Add($"DeletionDate  = '{General.ToSqlDate(upd.DeletionDate.Value)}'");
+            if (upd.RemoveDeletionDate) setParts.Add("DeletionDate  = NULL");
 
             if (setParts.Count == 0) return null;
 
             string cmd = $"UPDATE [User] SET {string.Join(", ", setParts)} WHERE ID = {upd.Id}";
 
             dynamic res = ExecCommand(new RequestCmd { Cmd = cmd });
-
-            // Refresh cached logged-in user if not a soft-delete operation
-           
 
             return res;
         }

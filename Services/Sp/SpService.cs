@@ -585,7 +585,8 @@ namespace Seiiarty.Services.Sp
                         FirebaseToken = General.GetPara(p, "FirebaseToken"),
                         PhoneToken = General.GetPara(p, "PhoneToken"),
                         LastLogin = General.GetParaDate(p, "LastLogin"),
-                        Admin = General.GetParaBool(p, "Admin") ?? false,
+                        // ── FIX: pass nullable — only set when the caller explicitly sends "Admin"
+                        Admin = General.GetParaBool(p, "Admin"),
                         DeletionDate = General.GetParaDate(p, "DeletionDate"),
                         RemoveDeletionDate = General.GetParaBool(p, "RemoveDeletionDate") ?? false,
                     });
